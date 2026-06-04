@@ -714,13 +714,12 @@ function mostrarResultadoIA(datos){
   // Mostrar resumen IA
   const rf=document.getElementById('aiFields');
   const masasTot=datos.masas?datos.masas.reduce((s,m)=>s+m.obleas_m1+m.obleas_m2+m.obleas_m3,0):0;
-  const harAdicIA=parseFloat(datos.harina_adicional)||0;
   rf.innerHTML=`
     <div class="ai-field"><div class="ai-field-l">Fecha</div><div class="ai-field-v">${datos.fecha||'—'}</div></div>
     <div class="ai-field"><div class="ai-field-l">Operarios</div><div class="ai-field-v">${[datos.operario1,datos.operario2,datos.operario3,datos.operario4,datos.operario5].filter(Boolean).join(', ')||'—'}</div></div>
     <div class="ai-field"><div class="ai-field-l">Gas consumido</div><div class="ai-field-v">${(datos.gas_final-datos.gas_inicial).toFixed(1)} m³</div></div>
     <div class="ai-field"><div class="ai-field-l">Harina turno</div><div class="ai-field-v">${((datos.harina_turno1||0)+(datos.harina_turno2||0)).toFixed(2)} kg</div></div>
-    <div class="ai-field"><div class="ai-field-l">Harina adicional</div><div class="ai-field-v">${harAdicIA>0?harAdicIA.toFixed(3)+' kg':'—'}</div></div>
+    <div class="ai-field"><div class="ai-field-l">Harina adicional</div><div class="ai-field-v">${(parseFloat(datos.harina_adicional)||0)>0?((parseFloat(datos.harina_adicional)||0)).toFixed(3)+' kg':'—'}</div></div>
     <div class="ai-field"><div class="ai-field-l">Masas leídas</div><div class="ai-field-v">${datos.masas?datos.masas.length:0}</div></div>
     <div class="ai-field"><div class="ai-field-l">Total obleas</div><div class="ai-field-v">${masasTot.toLocaleString('es-CO')}</div></div>`;
   document.getElementById('aiResult').style.display='block';
@@ -737,11 +736,7 @@ function mostrarResultadoIA(datos){
   });
   set('s-obs',datos.observaciones);
   const elHadc=document.getElementById('s-hadc');
-  if(elHadc){
-    const nAdc=parseFloat(datos.harina_adicional)||0;
-    elHadc.value=nAdc>500?(nAdc/1000).toFixed(3):nAdc.toFixed(3);
-    elHadc.classList.add('ai-filled');
-  }
+  if(elHadc){const nAdc=parseFloat(datos.harina_adicional)||0;elHadc.value=nAdc>500?(nAdc/1000).toFixed(3):nAdc.toFixed(3);elHadc.classList.add('ai-filled');}
   calcAutosS();
 
   // Masas
@@ -940,7 +935,19 @@ function calcCosto(){const paq=parseInt(document.getElementById('cs-paq').value)
   `;}
 
 // ── REPORTES ─────────────────────────────────────────
-async function calcRep(){const todos=await getAll();const desde=document.getElementById('rp-d').value;const hasta=document.getElementById('rp-h').value;const f=todos.filter(r=>{if(desde&&r.fecha<desde)return false;if(hasta&&r.fecha>hasta)return false;return true;});const cont=document.getElementById('repCont');if(!f.length){cont.innerHTML='<div class="empty">📊<br>Sin datos para el período.</div>';return;}const totPaq=f.reduce((s,r)=>s+(r.totM1+r.totM2+r.totM3),0);const totHar=f.reduce((s,r)=>s+(r.harTotal||0),0);const totGas=f.reduce((s,r)=>s+(r.gasConsumo||0),0);const pM1=f.reduce((s,r)=>s+r.totM1,0);const pM2=f.reduce((s,r)=>s+r.totM2,0);const pM3=f.reduce((s,r)=>s+r.totM3,0);// Agrupar por día para calcular costo real (igual que en Costos)
+async function calcRep(){
+  const todos=await getAll();
+  const desde=document.getElementById('rp-d').value;
+  const hasta=document.getElementById('rp-h').value;
+  const f=todos.filter(r=>{if(desde&&r.fecha<desde)return false;if(hasta&&r.fecha>hasta)return false;return true;});
+  const cont=document.getElementById('repCont');
+  if(!f.length){cont.innerHTML='<div class="empty">\u{1F4CA}<br>Sin datos para el per\u00edodo.</div>';return;}
+  const totPaq=f.reduce((s,r)=>s+(r.totM1+r.totM2+r.totM3),0);
+  const totHar=f.reduce((s,r)=>s+(r.harTotal||0),0);
+  const totGas=f.reduce((s,r)=>s+(r.gasConsumo||0),0);
+  const pM1=f.reduce((s,r)=>s+r.totM1,0);
+  const pM2=f.reduce((s,r)=>s+r.totM2,0);
+  const pM3=f.reduce((s,r)=>s+r.totM3,0);
   const diasMap={};
   f.forEach(r=>{
     const d=r.fecha;
@@ -953,103 +960,33 @@ async function calcRep(){const todos=await getAll();const desde=document.getElem
     if(r.maq3)diasMap[d].m3=1;
   });
   const costosDia=Object.values(diasMap).map(d=>d.paq?calcCostoVal(d.paq,d.har,d.gas,d.m1,d.m2,d.m3):0).filter(v=>v>0);
-  const costProm=costosDia.length?costosDia.reduce((a,b)=>a+b,0)/costosDia.length:0;const maxM=Math.max(pM1,pM2,pM3)||1;const fmt=v=>'$'+Math.round(v).toLocaleString('es-CO');const porOp={};f.forEach(r=>{const paq=r.totM1+r.totM2+r.totM3;[r.op1,r.op2,r.op3,r.op4,r.op5].filter(Boolean).forEach(op=>{if(!porOp[op])porOp[op]=0;porOp[op]+=paq;});});const maxOp=Math.max(...Object.values(porOp))||1;cont.innerHTML=`<div class="stat-g"><div class="sc"><div class="sc-l">Total paquetes</div><div class="sc-v">${totPaq.toLocaleString('es-CO')}<span class="sc-u"> paq</span></div></div><div class="sc"><div class="sc-l">Harina consumida</div><div class="sc-v">${totHar.toFixed(1)}<span class="sc-u"> kg</span></div></div><div class="sc"><div class="sc-l">Gas consumido</div><div class="sc-v">${totGas.toFixed(1)}<span class="sc-u"> m³</span></div></div><div class="sc"><div class="sc-l">Costo prom/paq</div><div class="sc-v">${fmt(costProm)}</div></div><div class="sc"><div class="sc-l">Harina/paquete</div><div class="sc-v">${totPaq?((totHar/totPaq)*1000).toFixed(0):0}<span class="sc-u"> g</span></div></div><div class="sc"><div class="sc-l">Turnos</div><div class="sc-v">${f.length}</div></div></div><div class="chart-c"><div class="ct">Paquetes por máquina</div>${[['Máquina 1',pM1],['Máquina 2',pM2],['Máquina 3',pM3]].map(([l,v])=>`<div class="barrow"><div class="blbl">${l}</div><div class="btrack"><div class="bfill" style="width:${Math.round(v/maxM*100)}%"></div></div><div class="bval">${v.toLocaleString('es-CO')}</div></div>`).join('')}</div><div class="chart-c"><div class="ct">Producción por operario</div>${Object.entries(porOp).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([k,v])=>`<div class="barrow"><div class="blbl" title="${k}">${k.split(' ')[0]}</div><div class="btrack"><div class="bfill am" style="width:${Math.round(v/maxOp*100)}%"></div></div><div class="bval">${v.toLocaleString('es-CO')}</div></div>`).join('')}</div>`;}
-
-
-  const rb=document.getElementById('repBtns');if(rb)rb.style.display='flex';// ── EXPORT ───────────────────────────────────────────
-
-// ── REPORTE HTML CON GRAFICAS ──────────────────────
-async function verReporteHTML(){
-  const desde=document.getElementById('rp-d').value;
-  const hasta=document.getElementById('rp-h').value;
-  const todos=await getAll();
-  const f=todos.filter(r=>{if(desde&&r.fecha<desde)return false;if(hasta&&r.fecha>hasta)return false;return true;}).sort((a,b)=>a.fecha.localeCompare(b.fecha));
-  if(!f.length){alert('Sin datos.');return;}
-  const dias={};
-  f.forEach(r=>{
-    const d=r.fecha;
-    if(!dias[d])dias[d]={t:[],pM1:0,pM2:0,pM3:0,har:0,gas:0,m1:0,m2:0,m3:0};
-    dias[d].t.push(r);dias[d].pM1+=r.totM1;dias[d].pM2+=r.totM2;dias[d].pM3+=r.totM3;
-    dias[d].har+=r.harTotal||0;dias[d].gas+=r.gasConsumo||0;
-    if(r.maq1)dias[d].m1=1;if(r.maq2)dias[d].m2=1;if(r.maq3)dias[d].m3=1;
-  });
-  const DA=Object.entries(dias).sort();
-  const totPaq=DA.reduce((s,[,v])=>s+v.pM1+v.pM2+v.pM3,0);
-  const totHar=DA.reduce((s,[,v])=>s+v.har,0);
-  const totGas=DA.reduce((s,[,v])=>s+v.gas,0);
-  const costosDia=DA.map(([,v])=>{const p=v.pM1+v.pM2+v.pM3;return p?Math.round(calcCostoVal(p,v.har,v.gas,v.m1,v.m2,v.m3)):0;});
-  const costoProm=costosDia.filter(v=>v>0).length?Math.round(costosDia.filter(v=>v>0).reduce((a,b)=>a+b)/costosDia.filter(v=>v>0).length):0;
-  const maxPaq=Math.max(...DA.map(([,v])=>v.pM1+v.pM2+v.pM3))||1;
-  const maxC=Math.max(...costosDia)||1;
-  const maxH=Math.max(...DA.map(([,v])=>v.har))||1;
-  const maxG=Math.max(...DA.map(([,v])=>v.gas))||1;
+  const costProm=costosDia.length?costosDia.reduce((a,b)=>a+b,0)/costosDia.length:0;
+  const maxM=Math.max(pM1,pM2,pM3)||1;
   const fmt=v=>'$'+Math.round(v).toLocaleString('es-CO');
-  const barG=(pct,color,lbl)=>'<div style="flex:1;height:20px;background:#f0f0ec;border-radius:4px;overflow:hidden"><div style="height:100%;background:'+color+';width:'+pct+'%;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:5px"><span style="font-size:10px;font-weight:700;color:#fff">'+lbl+'</span></div></div>';
-
-  // Producción por operario (todos los turnos del período)
-  const porOpRep={};
-  f.forEach(r=>{const paq=r.totM1+r.totM2+r.totM3;[r.op1,r.op2,r.op3,r.op4,r.op5].filter(Boolean).forEach(op=>{if(!porOpRep[op])porOpRep[op]=0;porOpRep[op]+=paq;});});
-  const maxOpRep=Math.max(...Object.values(porOpRep))||1;
-  let barsOp='';
-  Object.entries(porOpRep).sort((a,b)=>b[1]-a[1]).forEach(([op,v])=>{
-    barsOp+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px"><div style="width:65px;font-size:10px;color:#666;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+op.split(' ')[0]+'</div>'+barG(Math.round(v/maxOpRep*100),'#b8860b',v.toLocaleString('es-CO'))+'</div>';
+  const porOp={};
+  f.forEach(r=>{
+    const paq=r.totM1+r.totM2+r.totM3;
+    [r.op1,r.op2,r.op3,r.op4,r.op5].filter(Boolean).forEach(function(op){if(!porOp[op])porOp[op]=0;porOp[op]+=paq;});
   });
-    const p=v.pM1+v.pM2+v.pM3;
-    const c=costosDia[i];
-    const maq=[v.m1?'M1':'',v.m2?'M2':'',v.m3?'M3':''].filter(Boolean).join('+');
-    rows+='<tr><td>'+d+'</td><td>'+v.t.length+'</td><td>'+v.pM1+'</td><td>'+v.pM2+'</td><td>'+v.pM3+'</td><td style="font-weight:700">'+p+'</td><td>'+v.har.toFixed(1)+'</td><td>'+v.gas.toFixed(1)+'</td><td>'+maq+'</td><td><b>'+fmt(c)+'</b></td></tr>';
-  });
-
-  let barsPaq='',barsC='',barsH='';
-  DA.forEach(([d,v],i)=>{
-    const p=v.pM1+v.pM2+v.pM3;
-    const lbl=d.slice(5);
-    barsPaq+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px"><div style="width:45px;font-size:10px;color:#666;text-align:right">'+lbl+'</div>'+barG(Math.round(p/maxPaq*100),'#1b5e3b',p)+'</div>';
-    barsC+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px"><div style="width:45px;font-size:10px;color:#666;text-align:right">'+lbl+'</div>'+barG(Math.round(costosDia[i]/maxC*100),'#1565c0',fmt(costosDia[i]))+'</div>';
-    barsH+='<div style="margin-bottom:8px"><div style="font-size:10px;font-weight:600;color:#666;margin-bottom:3px">'+d+'</div>';
-    barsH+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px"><div style="width:45px;font-size:10px;color:#666;text-align:right">Harina</div>'+barG(Math.round(v.har/maxH*100),'#b8860b',v.har.toFixed(1)+' kg')+'</div>';
-    barsH+='<div style="display:flex;align-items:center;gap:6px"><div style="width:45px;font-size:10px;color:#666;text-align:right">Gas</div>'+barG(Math.round(v.gas/maxG*100),'#c62828',v.gas.toFixed(1)+' m³')+'</div></div>';
-  });
-
-  const html='<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Reporte Obleas</title>'
-    +'<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui,sans-serif;background:#f5f5f0;color:#1a1a1a;padding:14px}'
-    +'.h{background:#1b5e3b;color:#fff;padding:14px;border-radius:10px;margin-bottom:14px}'
-    +'.h h1{font-size:17px;font-weight:700}.h p{font-size:11px;opacity:.8;margin-top:3px}'
-    +'.sg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}'
-    +'.sc{background:#fff;border-radius:8px;padding:11px;box-shadow:0 1px 3px rgba(0,0,0,.1)}'
-    +'.sl{font-size:10px;color:#666;margin-bottom:3px;text-transform:uppercase;letter-spacing:.4px;font-weight:700}'
-    +'.sv{font-size:19px;font-weight:700}.su{font-size:11px;color:#666;font-weight:400}'
-    +'.sec{background:#fff;border-radius:10px;padding:13px;margin-bottom:13px;box-shadow:0 1px 3px rgba(0,0,0,.1)}'
-    +'.sec h2{font-size:12px;font-weight:700;color:#1b5e3b;margin-bottom:11px;text-transform:uppercase;letter-spacing:.5px}'
-    +'table{width:100%;border-collapse:collapse;font-size:11px}'
-    +'th{background:#f5f5f0;padding:7px 5px;text-align:left;font-size:10px;font-weight:700;color:#666;border-bottom:1px solid #e0e0d8}'
-    +'td{padding:7px 5px;border-bottom:1px solid #e0e0d8}'
-    +'tr:last-child td{background:#e8f5ee;font-weight:700}'
-    +'</style></head><body>'
-    +'<div class="h"><h1>Reporte Produccion Obleas</h1><p>Dulce Maria · '+desde+' al '+hasta+'</p></div>'
-    +'<div class="sg">'
-    +'<div class="sc"><div class="sl">Total paquetes</div><div class="sv">'+totPaq.toLocaleString('es-CO')+'<span class="su"> paq</span></div></div>'
-    +'<div class="sc"><div class="sl">Dias trabajados</div><div class="sv">'+DA.length+'</div></div>'
-    +'<div class="sc"><div class="sl">Harina consumida</div><div class="sv">'+totHar.toFixed(1)+'<span class="su"> kg</span></div></div>'
-    +'<div class="sc"><div class="sl">Gas consumido</div><div class="sv">'+totGas.toFixed(1)+'<span class="su"> m³</span></div></div>'
-    +'<div class="sc"><div class="sl">Prom paq/dia</div><div class="sv">'+(DA.length?Math.round(totPaq/DA.length):0)+'</div></div>'
-    +'<div class="sc" style="background:#e8f5ee"><div class="sl">Costo prom/paq</div><div class="sv" style="color:#1b5e3b">'+fmt(costoProm)+'</div></div>'
-    +'</div>'
-    +'<div class="sec"><h2>Produccion diaria (paquetes)</h2>'+barsPaq+'</div>'
-    +'<div class="sec"><h2>Costo por paquete por dia</h2>'+barsC+'</div>'
-    +'<div class="sec"><h2>Produccion por operario (total período)</h2>'+barsOp+'</div>'
-    +'<div class="sec"><h2>Harina y gas por dia</h2>'+barsH+'</div>'
-    +'<div class="sec"><h2>Detalle completo por dia</h2>'
-    +'<table><thead><tr><th>Fecha</th><th>T</th><th>M1</th><th>M2</th><th>M3</th><th>Total</th><th>Har</th><th>Gas</th><th>Maq</th><th>$/paq</th></tr></thead>'
-    +'<tbody>'+rows
-    +'<tr><td colspan="5">TOTAL</td><td>'+totPaq+'</td><td>'+totHar.toFixed(1)+'</td><td>'+totGas.toFixed(1)+'</td><td></td><td>'+fmt(costoProm)+'</td></tr>'
-    +'</tbody></table></div>'
-    +'<div style="text-align:center;font-size:10px;color:#999;margin-top:14px">'+new Date().toLocaleString('es-CO')+'</div>'
-    +'</body></html>';
-
-  const blob=new Blob([html],{type:'text/html;charset=utf-8'});
-  const url=URL.createObjectURL(blob);
-  window.open(url,'_blank');
+  const maxOp=Math.max(...Object.values(porOp))||1;
+  const maqBars=[['M\u00e1quina 1',pM1],['M\u00e1quina 2',pM2],['M\u00e1quina 3',pM3]].map(function(x){
+    return '<div class="barrow"><div class="blbl">'+x[0]+'</div><div class="btrack"><div class="bfill" style="width:'+Math.round(x[1]/maxM*100)+'%"></div></div><div class="bval">'+x[1].toLocaleString('es-CO')+'</div></div>';
+  }).join('');
+  const opBars=Object.entries(porOp).sort(function(a,b){return b[1]-a[1];}).slice(0,6).map(function(x){
+    return '<div class="barrow"><div class="blbl" title="'+x[0]+'">'+x[0].split(' ')[0]+'</div><div class="btrack"><div class="bfill am" style="width:'+Math.round(x[1]/maxOp*100)+'%"></div></div><div class="bval">'+x[1].toLocaleString('es-CO')+'</div></div>';
+  }).join('');
+  cont.innerHTML=
+    '<div class="stat-g">'+
+    '<div class="sc"><div class="sc-l">Total paquetes</div><div class="sc-v">'+totPaq.toLocaleString('es-CO')+'<span class="sc-u"> paq</span></div></div>'+
+    '<div class="sc"><div class="sc-l">Harina consumida</div><div class="sc-v">'+totHar.toFixed(1)+'<span class="sc-u"> kg</span></div></div>'+
+    '<div class="sc"><div class="sc-l">Gas consumido</div><div class="sc-v">'+totGas.toFixed(1)+'<span class="sc-u"> m³</span></div></div>'+
+    '<div class="sc"><div class="sc-l">Costo prom/paq</div><div class="sc-v">'+fmt(costProm)+'</div></div>'+
+    '<div class="sc"><div class="sc-l">Harina/paquete</div><div class="sc-v">'+(totPaq?((totHar/totPaq)*1000).toFixed(0):0)+'<span class="sc-u"> g</span></div></div>'+
+    '<div class="sc"><div class="sc-l">Turnos</div><div class="sc-v">'+f.length+'</div></div>'+
+    '</div>'+
+    '<div class="chart-c"><div class="ct">Paquetes por máquina</div>'+maqBars+'</div>'+
+    '<div class="chart-c"><div class="ct">Producción por operario</div>'+opBars+'</div>';
+  const rb=document.getElementById('repBtns');if(rb)rb.style.display='flex';
 }
 
 async function expCSVReporte(){
