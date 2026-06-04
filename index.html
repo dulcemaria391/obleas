@@ -714,11 +714,13 @@ function mostrarResultadoIA(datos){
   // Mostrar resumen IA
   const rf=document.getElementById('aiFields');
   const masasTot=datos.masas?datos.masas.reduce((s,m)=>s+m.obleas_m1+m.obleas_m2+m.obleas_m3,0):0;
+  const harAdicIA=parseFloat(datos.harina_adicional)||0;
   rf.innerHTML=`
     <div class="ai-field"><div class="ai-field-l">Fecha</div><div class="ai-field-v">${datos.fecha||'—'}</div></div>
     <div class="ai-field"><div class="ai-field-l">Operarios</div><div class="ai-field-v">${[datos.operario1,datos.operario2,datos.operario3,datos.operario4,datos.operario5].filter(Boolean).join(', ')||'—'}</div></div>
     <div class="ai-field"><div class="ai-field-l">Gas consumido</div><div class="ai-field-v">${(datos.gas_final-datos.gas_inicial).toFixed(1)} m³</div></div>
-    <div class="ai-field"><div class="ai-field-l">Harina</div><div class="ai-field-v">${(datos.harina_turno1+datos.harina_turno2).toFixed(2)} kg</div></div>
+    <div class="ai-field"><div class="ai-field-l">Harina turno</div><div class="ai-field-v">${((datos.harina_turno1||0)+(datos.harina_turno2||0)).toFixed(2)} kg</div></div>
+    <div class="ai-field"><div class="ai-field-l">Harina adicional</div><div class="ai-field-v">${harAdicIA>0?harAdicIA.toFixed(3)+' kg':'—'}</div></div>
     <div class="ai-field"><div class="ai-field-l">Masas leídas</div><div class="ai-field-v">${datos.masas?datos.masas.length:0}</div></div>
     <div class="ai-field"><div class="ai-field-l">Total obleas</div><div class="ai-field-v">${masasTot.toLocaleString('es-CO')}</div></div>`;
   document.getElementById('aiResult').style.display='block';
@@ -734,9 +736,12 @@ function mostrarResultadoIA(datos){
     const el=document.getElementById(id);if(el&&v!=null&&v!==''){el.value=fixHar(v);el.classList.add('ai-filled');}
   });
   set('s-obs',datos.observaciones);
-  const fixHarAdc=v=>{const n=parseFloat(v)||0;return n>500?(n/1000).toFixed(3):(n?n.toFixed(3):'');};
   const elHadc=document.getElementById('s-hadc');
-  if(elHadc&&datos.harina_adicional){elHadc.value=fixHarAdc(datos.harina_adicional);elHadc.classList.add('ai-filled');}
+  if(elHadc){
+    const nAdc=parseFloat(datos.harina_adicional)||0;
+    elHadc.value=nAdc>500?(nAdc/1000).toFixed(3):nAdc.toFixed(3);
+    elHadc.classList.add('ai-filled');
+  }
   calcAutosS();
 
   // Masas
@@ -865,7 +870,7 @@ async function guardarManual(){const fecha=document.getElementById('e-fecha').va
 function limpiarManual(){['e-fecha','e-lote','e-hing','e-hsal','e-op1','e-op2','e-sup','m-gi','m-gf','m-gcons','m-hi','m-hf','m-ht1','m-ht2','m-hcons','e-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});buildMasas();buildChecklist();document.getElementById('e-fecha').value=new Date().toISOString().slice(0,10);sumMasas();}
 
 // ── REGISTROS ────────────────────────────────────────
-async function renderRegs(){const todos=await getAll();const desde=document.getElementById('r-d').value;const hasta=document.getElementById('r-h').value;const f=todos.filter(r=>{if(desde&&r.fecha<desde)return false;if(hasta&&r.fecha>hasta)return false;return true;}).sort((a,b)=>b.fecha.localeCompare(a.fecha));const w=document.getElementById('regsWrap');if(!f.length){w.innerHTML='<div class="empty">📭<br>Sin registros para el período.</div>';return;}todos.forEach(r=>{if(r.foto)fotosMap[r.id]=r.foto;});w.innerHTML=`<div class="twrap"><table class="rt"><thead><tr><th>Fecha</th><th>Lote</th><th>Operario</th><th>Paq</th><th>Har kg</th><th>Gas m³</th><th>$/paq</th><th>Foto</th><th></th></tr></thead><tbody>${f.map(r=>{const p=r.totM1+r.totM2+r.totM3;const c=p?Math.round(calcCostoVal(p,r.harTotal,r.gasConsumo,r.maq1,r.maq2,r.maq3)):0;return`<tr><td>${r.fecha}</td><td>${r.lote||'—'}</td><td>${r.op1}</td><td style="font-weight:700">${p}</td><td>${(r.harTotal||0).toFixed(1)}</td><td>${r.gasConsumo||0}</td><td><span class="badge bok">$${c.toLocaleString('es-CO')}</span></td><td>${r.foto?`<img src="${r.foto}" class="thumb" onclick="openLb(${r.id})" alt="Planilla">`:'—'}</td><td><button onclick="delReg(${r.id})" style="background:none;border:none;cursor:pointer;font-size:16px;padding:4px">🗑</button></td></tr>`;}).join('')}</tbody></table></div><p style="font-size:11px;color:var(--t2);margin-top:8px">${f.length} turno(s)</p>`;}
+async function renderRegs(){const todos=await getAll();const desde=document.getElementById('r-d').value;const hasta=document.getElementById('r-h').value;const f=todos.filter(r=>{if(desde&&r.fecha<desde)return false;if(hasta&&r.fecha>hasta)return false;return true;}).sort((a,b)=>b.fecha.localeCompare(a.fecha));const w=document.getElementById('regsWrap');if(!f.length){w.innerHTML='<div class="empty">📭<br>Sin registros para el período.</div>';return;}todos.forEach(r=>{if(r.foto)fotosMap[r.id]=r.foto;});w.innerHTML=`<div class="twrap"><table class="rt"><thead><tr><th>Fecha</th><th>Lote</th><th>Operarios</th><th>Paq</th><th>Har kg</th><th>Gas m³</th><th>$/paq</th><th>Foto</th><th></th></tr></thead><tbody>${f.map(r=>{const p=r.totM1+r.totM2+r.totM3;const c=p?Math.round(calcCostoVal(p,r.harTotal,r.gasConsumo,r.maq1,r.maq2,r.maq3)):0;const ops=[r.op1,r.op2,r.op3,r.op4,r.op5].filter(Boolean).join(', ');return`<tr><td>${r.fecha}</td><td>${r.lote||'—'}</td><td>${ops||'—'}</td><td style="font-weight:700">${p}</td><td>${(r.harTotal||0).toFixed(1)}</td><td>${r.gasConsumo||0}</td><td><span class="badge bok">$${c.toLocaleString('es-CO')}</span></td><td>${r.foto?`<img src="${r.foto}" class="thumb" onclick="openLb(${r.id})" alt="Planilla">`:'—'}</td><td><button onclick="delReg(${r.id})" style="background:none;border:none;cursor:pointer;font-size:16px;padding:4px">🗑</button></td></tr>`;}).join('')}</tbody></table></div><p style="font-size:11px;color:var(--t2);margin-top:8px">${f.length} turno(s)</p>`;}
 function openLb(id){if(fotosMap[id]){document.getElementById('lbImg').src=fotosMap[id];document.getElementById('lb').classList.add('open');}}
 function closeLb(){document.getElementById('lb').classList.remove('open');}
 async function delReg(id){if(!confirm('¿Eliminar este registro?'))return;await dbW(s=>s.delete(id));delete fotosMap[id];renderRegs();}
@@ -907,7 +912,7 @@ async function cargarDiaCosto(){
   document.getElementById('cs-har').value=totHar.toFixed(3);
   document.getElementById('cs-gas').value=totGas.toFixed(2);
   // Show summary
-  const ops=[...new Set(turnos.map(r=>[r.op1,r.op2,r.op3,r.op4,r.op5].filter(Boolean)).flat())];
+  const ops=[...new Set(turnos.flatMap(r=>[r.op1,r.op2,r.op3,r.op4,r.op5].filter(Boolean)))];
   document.getElementById('cs-resumen').innerHTML=
     `<strong>${turnos.length} turno(s)</strong> encontrado(s) para ${fecha}<br>`+
     `Operarios: ${ops.join(', ')}<br>`+
@@ -948,7 +953,7 @@ async function calcRep(){const todos=await getAll();const desde=document.getElem
     if(r.maq3)diasMap[d].m3=1;
   });
   const costosDia=Object.values(diasMap).map(d=>d.paq?calcCostoVal(d.paq,d.har,d.gas,d.m1,d.m2,d.m3):0).filter(v=>v>0);
-  const costProm=costosDia.length?costosDia.reduce((a,b)=>a+b,0)/costosDia.length:0;const maxM=Math.max(pM1,pM2,pM3)||1;const fmt=v=>'$'+Math.round(v).toLocaleString('es-CO');const porOp={};f.forEach(r=>{const k=r.op1||'Sin nombre';if(!porOp[k])porOp[k]=0;porOp[k]+=(r.totM1+r.totM2+r.totM3);});const maxOp=Math.max(...Object.values(porOp))||1;cont.innerHTML=`<div class="stat-g"><div class="sc"><div class="sc-l">Total paquetes</div><div class="sc-v">${totPaq.toLocaleString('es-CO')}<span class="sc-u"> paq</span></div></div><div class="sc"><div class="sc-l">Harina consumida</div><div class="sc-v">${totHar.toFixed(1)}<span class="sc-u"> kg</span></div></div><div class="sc"><div class="sc-l">Gas consumido</div><div class="sc-v">${totGas.toFixed(1)}<span class="sc-u"> m³</span></div></div><div class="sc"><div class="sc-l">Costo prom/paq</div><div class="sc-v">${fmt(costProm)}</div></div><div class="sc"><div class="sc-l">Harina/paquete</div><div class="sc-v">${totPaq?((totHar/totPaq)*1000).toFixed(0):0}<span class="sc-u"> g</span></div></div><div class="sc"><div class="sc-l">Turnos</div><div class="sc-v">${f.length}</div></div></div><div class="chart-c"><div class="ct">Paquetes por máquina</div>${[['Máquina 1',pM1],['Máquina 2',pM2],['Máquina 3',pM3]].map(([l,v])=>`<div class="barrow"><div class="blbl">${l}</div><div class="btrack"><div class="bfill" style="width:${Math.round(v/maxM*100)}%"></div></div><div class="bval">${v.toLocaleString('es-CO')}</div></div>`).join('')}</div><div class="chart-c"><div class="ct">Producción por operario</div>${Object.entries(porOp).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([k,v])=>`<div class="barrow"><div class="blbl" title="${k}">${k.split(' ')[0]}</div><div class="btrack"><div class="bfill am" style="width:${Math.round(v/maxOp*100)}%"></div></div><div class="bval">${v.toLocaleString('es-CO')}</div></div>`).join('')}</div>`;}
+  const costProm=costosDia.length?costosDia.reduce((a,b)=>a+b,0)/costosDia.length:0;const maxM=Math.max(pM1,pM2,pM3)||1;const fmt=v=>'$'+Math.round(v).toLocaleString('es-CO');const porOp={};f.forEach(r=>{const paq=r.totM1+r.totM2+r.totM3;[r.op1,r.op2,r.op3,r.op4,r.op5].filter(Boolean).forEach(op=>{if(!porOp[op])porOp[op]=0;porOp[op]+=paq;});});const maxOp=Math.max(...Object.values(porOp))||1;cont.innerHTML=`<div class="stat-g"><div class="sc"><div class="sc-l">Total paquetes</div><div class="sc-v">${totPaq.toLocaleString('es-CO')}<span class="sc-u"> paq</span></div></div><div class="sc"><div class="sc-l">Harina consumida</div><div class="sc-v">${totHar.toFixed(1)}<span class="sc-u"> kg</span></div></div><div class="sc"><div class="sc-l">Gas consumido</div><div class="sc-v">${totGas.toFixed(1)}<span class="sc-u"> m³</span></div></div><div class="sc"><div class="sc-l">Costo prom/paq</div><div class="sc-v">${fmt(costProm)}</div></div><div class="sc"><div class="sc-l">Harina/paquete</div><div class="sc-v">${totPaq?((totHar/totPaq)*1000).toFixed(0):0}<span class="sc-u"> g</span></div></div><div class="sc"><div class="sc-l">Turnos</div><div class="sc-v">${f.length}</div></div></div><div class="chart-c"><div class="ct">Paquetes por máquina</div>${[['Máquina 1',pM1],['Máquina 2',pM2],['Máquina 3',pM3]].map(([l,v])=>`<div class="barrow"><div class="blbl">${l}</div><div class="btrack"><div class="bfill" style="width:${Math.round(v/maxM*100)}%"></div></div><div class="bval">${v.toLocaleString('es-CO')}</div></div>`).join('')}</div><div class="chart-c"><div class="ct">Producción por operario</div>${Object.entries(porOp).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([k,v])=>`<div class="barrow"><div class="blbl" title="${k}">${k.split(' ')[0]}</div><div class="btrack"><div class="bfill am" style="width:${Math.round(v/maxOp*100)}%"></div></div><div class="bval">${v.toLocaleString('es-CO')}</div></div>`).join('')}</div>`;}
 
 
   const rb=document.getElementById('repBtns');if(rb)rb.style.display='flex';// ── EXPORT ───────────────────────────────────────────
@@ -981,8 +986,14 @@ async function verReporteHTML(){
   const fmt=v=>'$'+Math.round(v).toLocaleString('es-CO');
   const barG=(pct,color,lbl)=>'<div style="flex:1;height:20px;background:#f0f0ec;border-radius:4px;overflow:hidden"><div style="height:100%;background:'+color+';width:'+pct+'%;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:5px"><span style="font-size:10px;font-weight:700;color:#fff">'+lbl+'</span></div></div>';
 
-  let rows='';
-  DA.forEach(([d,v],i)=>{
+  // Producción por operario (todos los turnos del período)
+  const porOpRep={};
+  f.forEach(r=>{const paq=r.totM1+r.totM2+r.totM3;[r.op1,r.op2,r.op3,r.op4,r.op5].filter(Boolean).forEach(op=>{if(!porOpRep[op])porOpRep[op]=0;porOpRep[op]+=paq;});});
+  const maxOpRep=Math.max(...Object.values(porOpRep))||1;
+  let barsOp='';
+  Object.entries(porOpRep).sort((a,b)=>b[1]-a[1]).forEach(([op,v])=>{
+    barsOp+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px"><div style="width:65px;font-size:10px;color:#666;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+op.split(' ')[0]+'</div>'+barG(Math.round(v/maxOpRep*100),'#b8860b',v.toLocaleString('es-CO'))+'</div>';
+  });
     const p=v.pM1+v.pM2+v.pM3;
     const c=costosDia[i];
     const maq=[v.m1?'M1':'',v.m2?'M2':'',v.m3?'M3':''].filter(Boolean).join('+');
@@ -1026,6 +1037,7 @@ async function verReporteHTML(){
     +'</div>'
     +'<div class="sec"><h2>Produccion diaria (paquetes)</h2>'+barsPaq+'</div>'
     +'<div class="sec"><h2>Costo por paquete por dia</h2>'+barsC+'</div>'
+    +'<div class="sec"><h2>Produccion por operario (total período)</h2>'+barsOp+'</div>'
     +'<div class="sec"><h2>Harina y gas por dia</h2>'+barsH+'</div>'
     +'<div class="sec"><h2>Detalle completo por dia</h2>'
     +'<table><thead><tr><th>Fecha</th><th>T</th><th>M1</th><th>M2</th><th>M3</th><th>Total</th><th>Har</th><th>Gas</th><th>Maq</th><th>$/paq</th></tr></thead>'
