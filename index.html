@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>FR-PRO-OB-01 · Obleas</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--gr:#1b5e3b;--gr2:#2e7d52;--gr3:#e8f5ee;--gr4:#c8e6c9;--am:#b8860b;--am2:#fff8e1;--rd:#c62828;--rd2:#fef0f0;--bg:#fff;--bg2:#f5f5f0;--bd:#e0e0d8;--t:#1a1a1a;--t2:#666660;--t3:#999}
+@media(prefers-color-scheme:dark){:root{--bg:#1a1a1a;--bg2:#242424;--bd:#333;--t:#f0f0ec;--t2:#aaa;--t3:#666;--gr3:#0d2e1a;--gr4:#1a3d20;--am2:#2a1f00;--rd2:#2a0a0a}}
+html,body{height:100%;font-family:system-ui,sans-serif;font-size:14px;background:var(--bg);color:var(--t)}
+.app{display:flex;flex-direction:column;height:100vh;max-width:600px;margin:0 auto;background:var(--bg)}
+.hdr{background:var(--gr);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.hdr-t{font-size:15px;font-weight:600}.hdr-s{font-size:11px;opacity:.7;margin-top:1px}
+.nav{display:flex;background:var(--bg2);border-bottom:1px solid var(--bd);overflow-x:auto;flex-shrink:0;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nb{padding:11px 13px;border:none;background:none;font-size:12px;font-weight:500;cursor:pointer;color:var(--t2);display:flex;align-items:center;gap:4px;white-space:nowrap;border-bottom:2.5px solid transparent;font-family:inherit}
+.nb.on{color:var(--gr);border-bottom-color:var(--gr);background:var(--bg)}
+.pages{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.pg{display:none;padding:14px 12px 90px}.pg.on{display:block}
+.sec{background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:12px}
+.stit{font-size:11px;font-weight:700;color:var(--gr);margin-bottom:11px;display:flex;align-items:center;gap:5px;text-transform:uppercase;letter-spacing:.6px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.f{margin-bottom:10px}.f:last-child{margin-bottom:0}
+.f label{display:block;font-size:11px;font-weight:600;color:var(--t2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px}
+.f input,.f select,.f textarea{width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-size:14px;font-family:inherit;background:var(--bg2);color:var(--t);-webkit-appearance:none}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--gr);background:var(--bg)}
+.f textarea{height:68px;resize:none;line-height:1.5}
+.f .calc{background:var(--gr3);border-color:var(--gr4);color:var(--gr);font-weight:700}
+.f .ai-filled{background:#e8f0fe;border-color:#4285f4;color:#1a1a1a}
+
+/* SCAN AREA */
+.scan-area{border:2px dashed var(--bd);border-radius:12px;padding:20px;text-align:center;background:var(--bg2);cursor:pointer;transition:all .2s;margin-bottom:12px}
+.scan-area:active{border-color:var(--gr);background:var(--gr3)}
+.scan-area.scanning{border-color:#4285f4;background:#e8f0fe;pointer-events:none}
+.scan-area.done{border-color:var(--gr);background:var(--gr3)}
+.scan-ico{font-size:40px;margin-bottom:8px}
+.scan-title{font-size:15px;font-weight:600;color:var(--t);margin-bottom:4px}
+.scan-sub{font-size:12px;color:var(--t2);line-height:1.5}
+.scan-preview{width:100%;border-radius:8px;margin-top:12px;max-height:200px;object-fit:cover;display:none}
+
+/* PROGRESS */
+.progress-wrap{display:none;margin-top:12px}
+.progress-bar{height:6px;background:var(--bd);border-radius:3px;overflow:hidden;margin-bottom:8px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gr),#4285f4);border-radius:3px;transition:width .3s;width:0%}
+.progress-txt{font-size:12px;color:#4285f4;text-align:center;font-weight:500}
+
+/* RESULTADO IA */
+.ai-result{background:linear-gradient(135deg,#e8f5ee,#e8f0fe);border:1px solid var(--gr4);border-radius:10px;padding:14px;margin-bottom:12px;display:none}
+.ai-result-title{font-size:12px;font-weight:700;color:var(--gr);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.ai-fields{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px}
+.ai-field{background:rgba(255,255,255,.6);border-radius:6px;padding:6px 8px}
+.ai-field-l{color:var(--t2);font-size:10px;font-weight:600;text-transform:uppercase}
+.ai-field-v{color:var(--t);font-weight:600;margin-top:2px}
+
+.alrt{padding:11px 14px;border-radius:8px;font-size:13px;margin-bottom:12px;display:none;font-weight:500;line-height:1.4}
+.alrt-ok{background:var(--gr3);color:var(--gr);border:1px solid var(--gr4)}
+.alrt-err{background:var(--rd2);color:var(--rd);border:1px solid #f4949440}
+.alrt-info{background:#e8f0fe;color:#1a56db;border:1px solid #93c5fd}
+
+/* MASA TABLE */
+.masa-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table.mt{width:100%;border-collapse:collapse;font-size:12px;min-width:540px}
+table.mt th{background:var(--bg2);padding:7px 5px;text-align:center;font-size:10px;font-weight:700;color:var(--t2);border-bottom:1px solid var(--bd);white-space:nowrap;text-transform:uppercase}
+table.mt td{padding:3px 2px;border-bottom:1px solid var(--bd);text-align:center}
+table.mt td input{width:100%;padding:6px 2px;border:1px solid var(--bd);border-radius:5px;font-size:12px;text-align:center;background:var(--bg2);color:var(--t);font-family:inherit}
+table.mt td input.ai-filled{background:#e8f0fe;border-color:#4285f4}
+table.mt td input:focus{outline:none;border-color:var(--gr)}
+table.mt .tot td{background:var(--gr3);color:var(--gr);font-weight:700;padding:8px 4px}
+
+.btn{padding:11px 16px;border-radius:8px;border:1px solid var(--bd);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:6px;-webkit-appearance:none;transition:opacity .15s}
+.btn:active{opacity:.75}
+.bp{background:var(--gr);color:#fff;border-color:var(--gr)}
+.bs{background:var(--bg2);color:var(--t)}
+.bd2{background:var(--rd);color:#fff;border-color:var(--rd)}
+.bai{background:linear-gradient(135deg,#1a73e8,#0d47a1);color:#fff;border:none}
+.btn-full{width:100%;justify-content:center;padding:13px}
+
+.ck-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--bd);border-radius:8px;margin-bottom:8px;background:var(--bg2);cursor:pointer}
+.ck-item input[type=checkbox]{width:18px;height:18px;flex-shrink:0;accent-color:var(--gr)}
+.ck-item.checked{background:var(--gr3);border-color:var(--gr4)}
+
+/* CONFIG API KEY */
+.api-banner{background:linear-gradient(135deg,#1a73e8,#0d47a1);border-radius:10px;padding:16px;margin-bottom:12px;color:#fff}
+.api-banner h3{font-size:14px;font-weight:600;margin-bottom:6px}
+.api-banner p{font-size:12px;opacity:.85;line-height:1.5;margin-bottom:10px}
+.api-input{width:100%;padding:10px 12px;border:none;border-radius:8px;font-size:13px;font-family:inherit;background:rgba(255,255,255,.15);color:#fff;placeholder-color:rgba(255,255,255,.6)}
+.api-input::placeholder{color:rgba(255,255,255,.6)}
+.api-input:focus{outline:none;background:rgba(255,255,255,.25)}
+
+.twrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table.rt{width:100%;border-collapse:collapse;font-size:12px;min-width:480px}
+table.rt th{background:var(--bg2);padding:8px 7px;text-align:left;font-size:10px;font-weight:700;color:var(--t2);border-bottom:1px solid var(--bd);white-space:nowrap;text-transform:uppercase}
+table.rt td{padding:8px 7px;border-bottom:1px solid var(--bd);color:var(--t);vertical-align:middle}
+table.rt tr:nth-child(even) td{background:var(--bg2)}
+.badge{display:inline-block;padding:3px 7px;border-radius:20px;font-size:10px;font-weight:700}
+.bok{background:var(--gr3);color:var(--gr)}.bw{background:var(--am2);color:var(--am)}
+.thumb{width:36px;height:28px;object-fit:cover;border-radius:4px;cursor:pointer;border:1px solid var(--bd)}
+
+.cost-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--bd)}
+.cost-row:last-child{border:none}
+.cost-lbl{font-size:13px;color:var(--t2)}.cost-val{font-size:13px;font-weight:700}
+.cost-tot{display:flex;justify-content:space-between;padding:12px 0 4px;border-top:2px solid var(--gr);margin-top:4px}
+.cost-tot .cost-lbl{font-weight:700;color:var(--gr);font-size:14px}
+.cost-tot .cost-val{font-size:22px;font-weight:700;color:var(--gr)}
+.psug{background:var(--gr3);border-radius:8px;padding:12px;text-align:center;margin-top:12px;border:1px solid var(--gr4)}
+.psug-l{font-size:10px;color:var(--gr);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+.psug-v{font-size:26px;font-weight:700;color:var(--gr)}
+
+.stat-g{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.sc{background:var(--bg2);border-radius:8px;padding:12px}
+.sc-l{font-size:10px;color:var(--t2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;font-weight:700}
+.sc-v{font-size:22px;font-weight:700;color:var(--t);line-height:1.1}
+.sc-u{font-size:11px;color:var(--t2);font-weight:400}
+.chart-c{background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:12px}
+.ct{font-size:11px;font-weight:700;color:var(--t);margin-bottom:12px;text-transform:uppercase;letter-spacing:.4px}
+.barrow{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.blbl{font-size:11px;color:var(--t2);width:75px;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btrack{flex:1;height:20px;background:var(--bg2);border-radius:4px;overflow:hidden}
+.bfill{height:100%;background:var(--gr);border-radius:4px}
+.bfill.am{background:var(--am)}
+.bval{font-size:11px;color:var(--t2);width:42px;flex-shrink:0;text-align:right}
+
+.empty{text-align:center;padding:48px 20px;color:var(--t2);font-size:14px;line-height:1.8}
+.hint{background:var(--am2);border:1px solid #f0c040;border-radius:8px;padding:10px 12px;font-size:12px;color:var(--am);line-height:1.5;margin-bottom:12px}
+.lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:999;align-items:center;justify-content:center}
+.lb.open{display:flex}
+.lb img{max-width:95vw;max-height:90vh;border-radius:10px;object-fit:contain}
+.lb-cls{position:fixed;top:14px;right:14px;background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;cursor:pointer;font-size:18px;color:#fff;display:flex;align-items:center;justify-content:center}
+/* INICIO DASHBOARD */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px}
+.kpi{background:var(--bg2);border-radius:10px;padding:13px 12px;border-left:4px solid var(--gr)}
+.kpi.am{border-left-color:var(--am)}
+.kpi.rd{border-left-color:var(--rd);background:var(--rd2)}
+.kpi-l{font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.kpi-v{font-size:20px;font-weight:700;color:var(--t);line-height:1.1}
+.kpi-u{font-size:11px;color:var(--t2);font-weight:400}
+.presup-bar{height:6px;background:var(--bd);border-radius:3px;overflow:hidden;margin-top:8px}
+.presup-fill{height:100%;border-radius:3px;transition:width .4s}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="hdr">
+  <span style="font-size:22px">📋</span>
+  <div><div class="hdr-t">Control de Producción Obleas</div>
+  <div class="hdr-s">FR-PRO-OB-01 · Dulce María · IA activada</div></div>
+</div>
+<nav class="nav">
+  <button class="nb on" onclick="pg('inicio')" id="n-inicio">🏠 Inicio</button>
+  <button class="nb" onclick="pg('scan')" id="n-scan">📸 Escanear</button>
+  <button class="nb" onclick="pg('manual')" id="n-manual">✏️ Manual</button>
+  <button class="nb" onclick="pg('registros')" id="n-registros">📊 Registros</button>
+  <button class="nb" onclick="pg('costos')" id="n-costos">🧮 Costos</button>
+  <button class="nb" onclick="pg('reportes')" id="n-reportes">📈 Reportes</button>
+  <button class="nb" onclick="pg('nomina')" id="n-nomina">👷 Nómina</button>
+  <button class="nb" onclick="pg('config')" id="n-config">⚙️ Config</button>
+</nav>
+<div class="pages">
+
+<!-- INICIO -->
+<div class="pg on" id="pg-inicio">
+
+<div class="sec">
+  <div class="stit">📦 Producción del mes</div>
+  <div class="kpi-grid" id="kpi-mes-paq"></div>
+</div>
+
+<div class="sec">
+  <div class="stit">📦 Producción de hoy</div>
+  <div class="kpi-grid" id="kpi-hoy-paq"></div>
+</div>
+
+<div class="sec">
+  <div class="stit">📊 Promedios del mes por paquete</div>
+  <div class="kpi-grid" id="kpi-promedios"></div>
+</div>
+
+<div class="sec">
+  <div class="stit">📋 Últimos turnos</div>
+  <p style="font-size:11px;color:var(--t2);margin-bottom:10px">← Desliza · Los datos se guardan en este dispositivo sin límite de tiempo.</p>
+  <div id="ultimos-turnos"></div>
+  <div style="margin-top:12px;display:flex;gap:8px">
+    <button class="btn bp" style="flex:1;justify-content:center;font-size:12px" onclick="expCSV()">⬇️ Descargar todos los datos</button>
+    <button class="btn bs" style="flex:1;justify-content:center;font-size:12px" onclick="pg('registros')">📊 Ver registros</button>
+  </div>
+</div>
+
+</div>
+
+<!-- ESCANEAR CON IA -->
+<div class="pg" id="pg-scan">
+<div id="alrt-scan" class="alrt"></div>
+
+<div class="sec">
+  <div class="stit">🤖 Leer planilla con IA</div>
+  <p style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:14px">Toma una foto de tu planilla física FR-PRO-OB-01 y la IA leerá automáticamente todos los datos: fecha, operarios, gas, harina y las 14 masas.</p>
+
+  <div class="scan-area" id="scanArea" onclick="document.getElementById('scanInput').click()">
+    <div class="scan-ico" id="scanIco">📷</div>
+    <div class="scan-title" id="scanTitle">Toca para fotografiar la planilla</div>
+    <div class="scan-sub" id="scanSub">La IA leerá los datos automáticamente</div>
+    <img id="scanPreview" class="scan-preview" alt="Planilla">
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-txt" id="progressTxt">Analizando planilla...</div>
+    </div>
+  </div>
+  <input type="file" id="scanInput" accept="image/*" capture="environment" style="display:none" onchange="escanearPlanilla(event)">
+</div>
+
+<div class="ai-result" id="aiResult">
+  <div class="ai-result-title">✅ IA leyó estos datos — revisa y confirma</div>
+  <div class="ai-fields" id="aiFields"></div>
+</div>
+
+<div id="formScan" style="display:none">
+  <div class="sec">
+    <div class="stit">📅 Datos generales</div>
+    <div class="row2">
+      <div class="f"><label>Fecha</label><input type="date" id="s-fecha"></div>
+      <div class="f"><label>Lote Nº</label><input type="text" id="s-lote" placeholder="Ej: 001-A"></div>
+    </div>
+    <div class="row2">
+      <div class="f"><label>Hora ingreso</label><input type="time" id="s-hing"></div>
+      <div class="f"><label>Hora salida</label><input type="time" id="s-hsal"></div>
+    </div>
+    <div style="font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;margin:8px 0 6px">⚙️ Máquina 1</div>
+    <div class="row2">
+      <div class="f"><label>Maquinero</label><input type="text" id="s-op1" placeholder="Yasir"></div>
+      <div class="f"><label>Cortador</label><input type="text" id="s-op2" placeholder="Angie"></div>
+    </div>
+    <div class="f"><label>Masero M1</label><input type="text" id="s-op3" placeholder="Jairo"></div>
+    <div style="font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;margin:8px 0 6px">⚙️ Máquina 2</div>
+    <div class="row2">
+      <div class="f"><label>Maquinero</label><input type="text" id="s-op4" placeholder="Fabian"></div>
+      <div class="f"><label>Cortador</label><input type="text" id="s-op5" placeholder="Karolay"></div>
+    </div>
+    <div style="font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;margin:8px 0 6px">⚙️ Máquina 3</div>
+    <div class="row2">
+      <div class="f"><label>Maquinero</label><input type="text" id="s-op6" placeholder="Benjamin"></div>
+      <div class="f"><label>Cortador</label><input type="text" id="s-op7" placeholder="Karolina"></div>
+    </div>
+    <div class="f"><label>Masero M3</label><input type="text" id="s-op8" placeholder="Carlos"></div>
+    <div class="f"><label>Supervisor</label><input type="text" id="s-sup"></div>
+  </div>
+  <div class="sec">
+    <div class="stit">🔥 Control de Gas</div>
+    <div class="row2">
+      <div class="f"><label>Gas inicial (m³)</label><input type="number" id="s-gi" step="0.1" oninput="calcAutosS()"></div>
+      <div class="f"><label>Gas final (m³)</label><input type="number" id="s-gf" step="0.1" oninput="calcAutosS()"></div>
+    </div>
+    <div class="f"><label>Consumo (m³)</label><input type="text" id="s-gcons" class="calc" readonly></div>
+  </div>
+  <div class="sec">
+    <div class="stit">🌾 Control de Harina</div>
+    <p style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:6px;text-transform:uppercase">Turno 1</p>
+    <div class="row2">
+      <div class="f"><label>Inicial T1 (kg)</label><input type="number" id="s-hi" step="0.001" oninput="calcAutosS()"></div>
+      <div class="f"><label>Adicional T1 (kg)</label><input type="number" id="s-ht1" step="0.001" oninput="calcAutosS()"></div>
+    </div>
+    <div class="f"><label>Final T1 (kg)</label><input type="number" id="s-hf" step="0.001" oninput="calcAutosS()"></div>
+    <p style="font-size:11px;font-weight:700;color:var(--t2);margin:8px 0 6px;text-transform:uppercase">Turno 2 (si aplica)</p>
+    <div class="row2">
+      <div class="f"><label>Inicial T2 (kg)</label><input type="number" id="s-hi2" step="0.001" oninput="calcAutosS()"></div>
+      <div class="f"><label>Adicional T2 (kg)</label><input type="number" id="s-ht2" step="0.001" oninput="calcAutosS()"></div>
+    </div>
+    <div class="f"><label>Final T2 (kg)</label><input type="number" id="s-hf2" step="0.001" oninput="calcAutosS()"></div>
+    <div class="f"><label>Harina consumida total (kg)</label><input type="text" id="s-hcons" class="calc" readonly></div>
+  </div>
+  <div class="sec">
+    <div class="stit">⚙️ Máquinas activas</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+      <div class="f"><label>Maq. 1</label><select id="s-m1"><option value="1">✅ Activa</option><option value="0">⛔ Parada</option></select></div>
+      <div class="f"><label>Maq. 2</label><select id="s-m2"><option value="1">✅ Activa</option><option value="0">⛔ Parada</option></select></div>
+      <div class="f"><label>Maq. 3</label><select id="s-m3"><option value="1">✅ Activa</option><option value="0">⛔ Parada</option></select></div>
+    </div>
+    <div class="f"><label>Observaciones</label><textarea id="s-obs" placeholder="Paros, incidentes..."></textarea></div>
+  </div>
+  <div class="sec">
+    <div class="stit">🥣 Control de Masas</div>
+    <p style="font-size:11px;color:var(--t2);margin-bottom:10px">← Desliza para ver todas las columnas. Campos en azul = leídos por IA.</p>
+    <div class="masa-wrap">
+      <table class="mt">
+        <thead><tr>
+          <th>N°</th><th>Harina kg</th><th>Obleas M1</th><th>Obleas M2</th><th>Obleas M3</th><th>Combos M1</th><th>Combos M2</th><th>Combos M3</th><th>Obs</th>
+        </tr></thead>
+        <tbody id="sMasaBody"></tbody>
+        <tfoot><tr class="tot">
+          <td>TOT</td><td id="stHar">0</td><td id="stM1">0</td><td id="stM2">0</td><td id="stM3">0</td><td id="stC1">0</td><td id="stC2">0</td><td id="stC3">0</td><td></td>
+        </tr></tfoot>
+      </table>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="stit">✅ Checklist Orden y Limpieza</div>
+    <div id="schklist"></div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+    <button class="btn bp btn-full" onclick="guardarScan()">💾 Guardar turno</button>
+    <button class="btn bs btn-full" onclick="nuevaScan()">🔄 Nueva foto</button>
+  </div>
+</div>
+
+<div id="noApiMsg" style="display:none">
+  <div style="background:var(--rd2);border:1px solid #f4949440;border-radius:10px;padding:16px;text-align:center">
+    <div style="font-size:32px;margin-bottom:8px">🔑</div>
+    <div style="font-size:14px;font-weight:600;color:var(--rd);margin-bottom:6px">Falta la clave de IA</div>
+    <div style="font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:12px">Para leer las planillas automáticamente necesitas una clave de la API de Anthropic. Ve a ⚙️ Config y agrégala.</div>
+    <button class="btn bp" onclick="pg('config')">⚙️ Ir a configuración</button>
+  </div>
+</div>
+</div>
+
+<!-- MANUAL -->
+<div class="pg" id="pg-manual">
+<div id="alrt-manual" class="alrt"></div>
+<div class="sec">
+  <div class="stit">📅 Datos generales</div>
+  <div class="row2">
+    <div class="f"><label>Fecha</label><input type="date" id="e-fecha"></div>
+    <div class="f"><label>Lote Nº</label><input type="text" id="e-lote" placeholder="Ej: 001-A"></div>
+  </div>
+  <div class="row2">
+    <div class="f"><label>Hora ingreso</label><input type="time" id="e-hing"></div>
+    <div class="f"><label>Hora salida</label><input type="time" id="e-hsal"></div>
+  </div>
+  <div style="font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;margin:4px 0 6px">⚙️ Máquina 1</div>
+  <div class="row2">
+    <div class="f"><label>Maquinero</label><input type="text" id="e-op1" placeholder="Yasir"></div>
+    <div class="f"><label>Cortador</label><input type="text" id="e-op2" placeholder="Angie"></div>
+  </div>
+  <div class="f"><label>Masero M1</label><input type="text" id="e-op3" placeholder="Jairo"></div>
+  <div style="font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;margin:8px 0 6px">⚙️ Máquina 2</div>
+  <div class="row2">
+    <div class="f"><label>Maquinero</label><input type="text" id="e-op4" placeholder="Fabian"></div>
+    <div class="f"><label>Cortador</label><input type="text" id="e-op5" placeholder="Karolay"></div>
+  </div>
+  <div style="font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;margin:8px 0 6px">⚙️ Máquina 3</div>
+  <div class="row2">
+    <div class="f"><label>Maquinero</label><input type="text" id="e-op6" placeholder="Benjamin"></div>
+    <div class="f"><label>Cortador</label><input type="text" id="e-op7" placeholder="Karolina"></div>
+  </div>
+  <div class="f"><label>Masero M3</label><input type="text" id="e-op8" placeholder="Carlos"></div>
+  <div class="f"><label>Supervisor</label><input type="text" id="e-sup" placeholder="Nombre"></div>
+</div>
+<div class="sec">
+  <div class="stit">🔥 Control de Gas</div>
+  <div class="row2">
+    <div class="f"><label>Gas inicial (m³)</label><input type="number" id="m-gi" min="0" step="0.1" placeholder="0" inputmode="decimal" oninput="calcAutosM()"></div>
+    <div class="f"><label>Gas final (m³)</label><input type="number" id="m-gf" min="0" step="0.1" placeholder="0" inputmode="decimal" oninput="calcAutosM()"></div>
+  </div>
+  <div class="f"><label>Consumo (m³) — calculado</label><input type="text" id="m-gcons" class="calc" readonly></div>
+</div>
+<div class="sec">
+  <div class="stit">🌾 Control de Harina</div>
+  <div class="row2">
+    <div class="f"><label>Harina inicial (kg)</label><input type="number" id="m-hi" min="0" step="0.001" placeholder="0.000" inputmode="decimal"></div>
+    <div class="f"><label>Harina final (kg)</label><input type="number" id="m-hf" min="0" step="0.001" placeholder="0.000" inputmode="decimal"></div>
+  </div>
+  <div class="row2">
+    <div class="f"><label>Harina turno 1 (kg)</label><input type="number" id="m-ht1" min="0" step="0.001" placeholder="0.000" inputmode="decimal" oninput="calcAutosM()"></div>
+    <div class="f"><label>Harina turno 2 (kg)</label><input type="number" id="m-ht2" min="0" step="0.001" placeholder="0.000" inputmode="decimal" oninput="calcAutosM()"></div>
+    <div class="f"><label>Harina adicional ingresada (kg)</label><input type="number" id="m-hadc" min="0" step="0.001" placeholder="0.000" inputmode="decimal" oninput="calcAutosM()"></div>
+  </div>
+  <div class="f"><label>Harina consumida (kg) — calculado</label><input type="text" id="m-hcons" class="calc" readonly></div>
+</div>
+<div class="sec">
+  <div class="stit">⚙️ Máquinas activas</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+    <div class="f"><label>Maq. 1</label><select id="e-m1"><option value="1">✅ Activa</option><option value="0">⛔ Parada</option></select></div>
+    <div class="f"><label>Maq. 2</label><select id="e-m2"><option value="1">✅ Activa</option><option value="0">⛔ Parada</option></select></div>
+    <div class="f"><label>Maq. 3</label><select id="e-m3"><option value="1">✅ Activa</option><option value="0">⛔ Parada</option></select></div>
+  </div>
+  <div class="f"><label>Observaciones</label><textarea id="e-obs" placeholder="Paros, incidentes..."></textarea></div>
+</div>
+<div class="sec">
+  <div class="stit">🥣 Control de Masas por turno</div>
+  <p style="font-size:11px;color:var(--t2);margin-bottom:10px">← Desliza para ver todas las columnas.</p>
+  <div class="masa-wrap">
+    <table class="mt">
+      <thead><tr>
+        <th>N°</th><th>Harina kg</th><th>Obleas M1</th><th>Obleas M2</th><th>Obleas M3</th><th>Combos M1</th><th>Combos M2</th><th>Combos M3</th><th>Obs</th>
+      </tr></thead>
+      <tbody id="masaBody"></tbody>
+      <tfoot><tr class="tot">
+        <td>TOT</td><td id="tHar">0</td><td id="tM1">0</td><td id="tM2">0</td><td id="tM3">0</td><td id="tC1">0</td><td id="tC2">0</td><td id="tC3">0</td><td></td>
+      </tr></tfoot>
+    </table>
+  </div>
+</div>
+<div class="sec">
+  <div class="stit">✅ Checklist Orden y Limpieza</div>
+  <div id="chklist"></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+  <button class="btn bp btn-full" onclick="guardarManual()">💾 Guardar turno completo</button>
+  <button class="btn bs btn-full" onclick="limpiarManual()">🗑 Limpiar</button>
+</div>
+</div>
+
+<!-- REGISTROS -->
+<div class="pg" id="pg-registros">
+<div style="display:flex;gap:8px;margin-bottom:10px">
+  <div class="f" style="flex:1;margin:0"><label>Desde</label><input type="date" id="r-d"></div>
+  <div class="f" style="flex:1;margin:0"><label>Hasta</label><input type="date" id="r-h"></div>
+</div>
+<div style="display:flex;gap:8px;margin-bottom:14px">
+  <button class="btn bs" style="flex:1;justify-content:center" onclick="renderRegs()">🔍 Filtrar</button>
+  <button class="btn bs" style="flex:1;justify-content:center" onclick="expCSV()">⬇️ CSV</button>
+</div>
+<div id="regsWrap"></div>
+</div>
+
+<!-- COSTOS -->
+<div class="pg" id="pg-costos">
+<div class="sec">
+  <div class="stit">🎯 Costo promedio presupuestado</div>
+  <div class="f">
+    <label>Costo presupuestado por paquete ($)</label>
+    <input type="number" id="cs-presup" value="6200" inputmode="numeric" oninput="calcCosto()" style="font-size:16px;font-weight:700;color:var(--gr)">
+  </div>
+  <p style="font-size:11px;color:var(--t2);margin-top:4px">Edita este valor cuando cambie el costo de referencia.</p>
+</div>
+<div class="sec">
+  <div class="stit">🧮 Selecciona el día a analizar</div>
+  <div class="f"><label>Fecha</label><input type="date" id="cs-fecha" oninput="cargarDiaCosto()"></div>
+  <div id="cs-resumen" style="font-size:12px;color:var(--t2);margin-top:8px;line-height:1.8"></div>
+  <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+    <div class="f" style="flex:1;min-width:120px;margin:0"><label>Total paquetes del día</label><input type="number" id="cs-paq" min="1" value="0" inputmode="numeric" oninput="calcCosto()"></div>
+    <div class="f" style="flex:1;min-width:120px;margin:0"><label>Harina total (kg)</label><input type="number" id="cs-har" min="0" step="0.01" value="0" inputmode="decimal" oninput="calcCosto()"></div>
+  </div>
+  <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+    <div class="f" style="flex:1;min-width:120px;margin:0"><label>Gas consumido (m³)</label><input type="number" id="cs-gas" min="0" step="0.1" value="0" inputmode="decimal" oninput="calcCosto()"></div>
+    <div class="f" style="flex:1;margin:0">
+      <label>Máquinas activas</label>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" id="cs-m1" checked onchange="calcCosto()" style="accent-color:var(--gr);width:16px;height:16px"> M1</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" id="cs-m2" checked onchange="calcCosto()" style="accent-color:var(--gr);width:16px;height:16px"> M2</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" id="cs-m3" checked onchange="calcCosto()" style="accent-color:var(--gr);width:16px;height:16px"> M3</label>
+        <input type="hidden" id="cs-ops" value="">
+        <input type="hidden" id="cs-combos" value="0|0|0">
+      </div>
+    </div>
+  </div>
+</div>
+<div class="sec" id="detCosto"></div>
+</div>
+
+<!-- REPORTES -->
+<div class="pg" id="pg-reportes">
+<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:flex-end">
+  <div class="f" style="flex:1;min-width:120px;margin:0"><label>Desde</label><input type="date" id="rp-d"></div>
+  <div class="f" style="flex:1;min-width:120px;margin:0"><label>Hasta</label><input type="date" id="rp-h"></div>
+  <button class="btn bp" onclick="calcRep()" style="height:43px">📊 Calcular</button>
+</div>
+<div id="repCont"></div>
+<div id="repBtns" style="display:none;margin-top:12px;display:flex;flex-direction:column;gap:8px">
+  <button class="btn bp btn-full" onclick="verReporteHTML()">📱 Ver reporte completo con gráficas</button>
+  <button class="btn bs btn-full" onclick="expCSVReporte()">💻 Descargar Excel (PC)</button>
+</div>
+</div>
+
+<!-- NÓMINA -->
+<div class="pg" id="pg-nomina">
+<div id="alrt-nomina" class="alrt"></div>
+<div class="hint">💡 Selecciona el período de pago (cada 2 sábados). La nómina se calcula automáticamente con los turnos registrados. El descuento de $5.000 por turno se acumula como bono hasta diciembre.</div>
+
+<div class="sec">
+  <div class="stit">📅 Período de nómina</div>
+  <div class="row2">
+    <div class="f"><label>Desde</label><input type="date" id="nom-d"></div>
+    <div class="f"><label>Hasta (sábado)</label><input type="date" id="nom-h"></div>
+  </div>
+  <button class="btn bp btn-full" onclick="calcNomina()" style="margin-top:10px">💰 Calcular nómina</button>
+</div>
+
+<div id="nominaResult"></div>
+
+<div class="sec" style="margin-top:12px">
+  <div class="stit">🎁 Bonos acumulados por empleado</div>
+  <div id="bonosResult"></div>
+  <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn bs" onclick="calcBonosTotal()">📊 Ver total acumulado</button>
+    <button class="btn bs" onclick="expNomina()">⬇️ Exportar nómina CSV</button>
+  </div>
+</div>
+</div>
+
+<!-- CONFIG -->
+<div class="pg" id="pg-config">
+<div class="api-banner">
+  <h3>🤖 Clave de IA (Anthropic)</h3>
+  <p>Para que la app lea las planillas automáticamente con la cámara, necesitas una clave de API de Anthropic. Es gratuita para empezar en console.anthropic.com</p>
+  <input type="password" class="api-input" id="cfg-apikey" placeholder="sk-ant-api03-..." oninput="guardarApiKey()">
+  <p style="font-size:11px;opacity:.7;margin-top:6px" id="apiStatus"></p>
+</div>
+<div class="sec">
+  <div class="stit">🌾 Insumos y harina</div>
+  <div class="row2">
+    <div class="f"><label>Valor bulto harina ($)</label><input type="number" id="cfg-bulto" value="145000" inputmode="numeric"></div>
+    <div class="f"><label>Lecitina/paquete ($)</label><input type="number" id="cfg-lec" value="180" inputmode="numeric"></div>
+    <div class="f"><label>Aditivos/paquete ($)</label><input type="number" id="cfg-adi" value="130" inputmode="numeric"></div>
+    <div class="f"><label>Adhesivo/paquete ($)</label><input type="number" id="cfg-ades" value="160" inputmode="numeric"></div>
+    <div class="f"><label>Icopor/paquete ($)</label><input type="number" id="cfg-ico" value="250" inputmode="numeric"></div>
+    <div class="f"><label>Bolsa/paquete ($)</label><input type="number" id="cfg-bol" value="200" inputmode="numeric"></div>
+    <div class="f"><label>Valor m³ gas ($)</label><input type="number" id="cfg-mgas" value="3500" inputmode="numeric"></div>
+  </div>
+</div>
+<div class="sec">
+  <div class="stit">👷 Mano de obra diaria ($)</div>
+  <p style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:8px;text-transform:uppercase">Máquina 1</p>
+  <div class="row2">
+    <div class="f"><label>Maquinero</label><input type="number" id="cfg-maq1m" value="70500" inputmode="numeric"></div>
+    <div class="f"><label>Cortador</label><input type="number" id="cfg-maq1c" value="65000" inputmode="numeric"></div>
+    <div class="f"><label>Masero</label><input type="number" id="cfg-maq1ma" value="65000" inputmode="numeric"></div>
+  </div>
+  <p style="font-size:11px;font-weight:700;color:var(--t2);margin:8px 0;text-transform:uppercase">Máquina 2</p>
+  <div class="row2">
+    <div class="f"><label>Maquinero</label><input type="number" id="cfg-maq2m" value="60000" inputmode="numeric"></div>
+    <div class="f"><label>Cortador</label><input type="number" id="cfg-maq2c" value="60000" inputmode="numeric"></div>
+  </div>
+  <p style="font-size:11px;font-weight:700;color:var(--t2);margin:8px 0;text-transform:uppercase">Máquina 3</p>
+  <div class="row2">
+    <div class="f"><label>Maquinero</label><input type="number" id="cfg-maq3m" value="70500" inputmode="numeric"></div>
+    <div class="f"><label>Cortador</label><input type="number" id="cfg-maq3c" value="65000" inputmode="numeric"></div>
+    <div class="f"><label>Masero</label><input type="number" id="cfg-maq3ma" value="65000" inputmode="numeric"></div>
+  </div>
+</div>
+<div class="sec">
+  <div class="stit">🏢 Costos fijos mensuales ($)</div>
+  <div class="row2">
+    <div class="f"><label>Gasolina</label><input type="number" id="cfg-gas2" value="500000" inputmode="numeric"></div>
+    <div class="f"><label>Jona+Aux+Tony+Estela</label><input type="number" id="cfg-jona" value="890000" inputmode="numeric"></div>
+    <div class="f"><label>Guantes</label><input type="number" id="cfg-guan" value="50000" inputmode="numeric"></div>
+    <div class="f"><label>Cinta</label><input type="number" id="cfg-cin" value="60000" inputmode="numeric"></div>
+    <div class="f"><label>Cajas</label><input type="number" id="cfg-caj" value="200000" inputmode="numeric"></div>
+    <div class="f"><label>Arriendo</label><input type="number" id="cfg-arr" value="250000" inputmode="numeric"></div>
+    <div class="f"><label>Arriendo + servicios</label><input type="number" id="cfg-arrs" value="750000" inputmode="numeric"></div>
+  </div>
+</div>
+<div class="sec">
+  <div class="stit">💾 Base de datos</div>
+  <p style="font-size:12px;color:var(--t2);margin-bottom:12px;line-height:1.6">Exporta regularmente para tener respaldo de todos tus registros.</p>
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <button class="btn bs btn-full" onclick="expJSON()">⬇️ Exportar respaldo JSON</button>
+    <label class="btn bs btn-full" style="cursor:pointer;justify-content:center">⬆️ Importar desde JSON<input type="file" accept=".json" style="display:none" onchange="impJSON(event)"></label>
+    <button class="btn bd2 btn-full" onclick="borrarTodo()">🗑 Borrar todos los registros</button>
+  </div>
+  <div id="dbInf" style="margin-top:12px;font-size:12px;color:var(--t2);line-height:2;background:var(--bg2);padding:10px;border-radius:8px"></div>
+</div>
+<button class="btn bp btn-full" onclick="guardarCfg()" style="margin-top:4px">💾 Guardar configuración</button>
+</div>
+
+</div><!-- /pages -->
+</div><!-- /app -->
+
+<div class="lb" id="lb" onclick="closeLb()">
+  <button class="lb-cls" onclick="closeLb()">✕</button>
+  <img id="lbImg" src="" alt="Planilla">
+</div>
+
+<script>
+let cfg={},fotosMap={};
+function normFecha(f){
+  if(!f)return '';
+  // Ya está en YYYY-MM-DD
+  if(/^\d{4}-\d{2}-\d{2}$/.test(f)){
+    // Corregir año incorrecto (2024/2025 → 2026)
+    var y=parseInt(f.slice(0,4));
+    if(y<2026)return '2026'+f.slice(4);
+    return f;
+  }
+  // Formato D/MM/YYYY o DD/MM/YYYY o D/MM/YY
+  var p=f.split('/');
+  if(p.length===3){
+    var yr=p[2].length===2?'20'+p[2]:p[2];
+    if(parseInt(yr)<2026)yr='2026';
+    return yr+'-'+p[1].padStart(2,'0')+'-'+p[0].padStart(2,'0');
+  }
+  var dt=new Date(f);
+  if(!isNaN(dt))return dt.toISOString().split('T')[0];
+  return f;
+}
+const LS_KEY='obleas_turnos';
+
+// ── STORAGE: localStorage (compatible Safari, Chrome, Firefox) ────────────────
+function getTurnos(){
+  try{return JSON.parse(localStorage.getItem(LS_KEY)||'[]');}
+  catch(e){return [];}
+}
+function saveTurnos(arr){
+  try{localStorage.setItem(LS_KEY,JSON.stringify(arr));}
+  catch(e){
+    // localStorage lleno (raro, ~5MB) — avisar
+    alert('⚠️ Almacenamiento lleno. Exporta un respaldo JSON desde ⚙️ Config y luego borra registros antiguos.');
+  }
+}
+function openDB(){return Promise.resolve();}  // compatibilidad — ya no se usa
+function getAll(){return Promise.resolve(getTurnos());}
+function dbW(fn){
+  // fn espera un store de IndexedDB — emulamos las operaciones necesarias
+  const arr=getTurnos();
+  const fakeStore={
+    add:reg=>{
+      reg.id=Date.now()+Math.floor(Math.random()*1000);
+      arr.push(reg);saveTurnos(arr);
+      return{result:reg.id};
+    },
+    delete:id=>{
+      saveTurnos(arr.filter(r=>r.id!==id));
+      return{result:undefined};
+    },
+    clear:()=>{saveTurnos([]);return{result:undefined};}
+  };
+  // Llamar fn y obtener el fake request
+  const fakeReq=fn(fakeStore);
+  return Promise.resolve(fakeReq&&fakeReq.result);
+}
+
+const CFGK=['bulto','lec','adi','ades','ico','bol','mgas','maq1m','maq1c','maq1ma','maq2m','maq2c','maq3m','maq3c','maq3ma','gas2','jona','guan','cin','caj','arr','arrs'];
+const CFGD={bulto:145000,lec:180,adi:130,ades:160,ico:250,bol:200,mgas:3500,maq1m:70500,maq1c:65000,maq1ma:65000,maq2m:60000,maq2c:60000,maq3m:70500,maq3c:65000,maq3ma:65000,gas2:500000,jona:890000,guan:50000,cin:60000,caj:200000,arr:250000,arrs:750000};
+function loadCfg(){
+  const d=localStorage.getItem('obleas_cfg');cfg=d?JSON.parse(d):{...CFGD};
+  CFGK.forEach(k=>{const el=document.getElementById('cfg-'+k);if(el)el.value=(cfg[k]!==undefined&&cfg[k]!==null)?cfg[k]:CFGD[k];});
+  const key=localStorage.getItem('obleas_apikey')||'';
+  const el=document.getElementById('cfg-apikey');if(el)el.value=key;
+  updApiStatus(key);
+}
+function guardarCfg(){
+  CFGK.forEach(k=>{const el=document.getElementById('cfg-'+k);if(el)cfg[k]=parseFloat(el.value)||0;});
+  try{localStorage.setItem('obleas_cfg',JSON.stringify(cfg));}catch(e){}
+  // Guardar clave también
+  const keyEl=document.getElementById('cfg-apikey');
+  if(keyEl){
+    const key=keyEl.value.trim();
+    try{localStorage.setItem('obleas_apikey',key);}catch(e){}
+    updApiStatus(key);
+  }
+  calcCosto();
+  // Mostrar confirmación en config
+  const btn=document.querySelector('[onclick="guardarCfg()"]');
+  if(btn){const orig=btn.textContent;btn.textContent='✅ ¡Guardado!';btn.style.background='#2e7d52';setTimeout(()=>{btn.textContent=orig;btn.style.background='';},2500);}
+}
+function guardarApiKey(){
+  const key=document.getElementById('cfg-apikey').value.trim();
+  try{localStorage.setItem('obleas_apikey',key);}catch(e){}
+  updApiStatus(key);
+}
+function updApiStatus(key){
+  const el=document.getElementById('apiStatus');if(!el)return;
+  if(key&&key.startsWith('sk-ant')){el.textContent='✅ Clave guardada — la IA puede leer tus planillas';}
+  else if(key){el.textContent='⚠️ La clave no parece correcta (debe empezar con sk-ant...)';}
+  else{el.textContent='Sin clave — solo modo manual disponible';}
+}
+function getApiKey(){return localStorage.getItem('obleas_apikey')||'';}
+
+function pg(name){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('pg-'+name).classList.add('on');
+  document.getElementById('n-'+name).classList.add('on');
+  if(name==='inicio')renderInicio();
+  if(name==='registros')renderRegs();
+  if(name==='reportes')calcRep();
+  if(name==='costos')calcCosto();
+  if(name==='config'){updDbInf();loadCfg();}
+  if(name==='nomina'){initNomina();}
+  if(name==='scan'){checkApiKey();}
+}
+function checkApiKey(){
+  const key=getApiKey();
+  document.getElementById('noApiMsg').style.display=key?'none':'block';
+  document.getElementById('scanArea').style.display=key?'':'none';
+}
+
+// ── ESCANEO IA ───────────────────────────────────────
+let scanPhotoData=null;
+async function escanearPlanilla(e){
+  const file=e.target.files[0];if(!file)return;
+  const key=getApiKey();
+  if(!key){showAlrt('scan','Primero configura tu clave de IA en ⚙️ Config.','err');return;}
+
+  // Comprimir imagen
+  const img=new Image();const url=URL.createObjectURL(file);
+  img.onload=async()=>{
+    const c=document.createElement('canvas');
+    const MAX=1200;let w=img.width,h=img.height;
+    if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}
+    if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}
+    c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
+    scanPhotoData=c.toDataURL('image/jpeg',0.85);
+    URL.revokeObjectURL(url);
+
+    // Mostrar preview
+    const prev=document.getElementById('scanPreview');
+    prev.src=scanPhotoData;prev.style.display='block';
+
+    // UI scanning
+    const area=document.getElementById('scanArea');
+    area.classList.add('scanning');
+    document.getElementById('scanIco').textContent='🔍';
+    document.getElementById('scanTitle').textContent='Analizando con IA...';
+    document.getElementById('scanSub').textContent='Esto toma unos segundos';
+    const pw=document.getElementById('progressWrap');pw.style.display='block';
+    animProgress();
+
+    try{
+      const resultado=await llamarIA(scanPhotoData,key);
+      mostrarResultadoIA(resultado);
+    }catch(err){
+      area.classList.remove('scanning');area.classList.remove('done');
+      document.getElementById('scanIco').textContent='❌';
+      document.getElementById('scanTitle').textContent='Error al analizar';
+      document.getElementById('scanSub').textContent=err.message||'Intenta de nuevo con mejor iluminación';
+      pw.style.display='none';
+    }
+  };
+  img.src=url;
+}
+
+function animProgress(){
+  let p=0;
+  const fill=document.getElementById('progressFill');
+  const txt=document.getElementById('progressTxt');
+  const msgs=['Procesando imagen...','Identificando campos...','Leyendo datos de masas...','Extrayendo valores...'];
+  let mi=0;
+  const iv=setInterval(()=>{
+    p+=Math.random()*8+2;if(p>92)p=92;
+    fill.style.width=p+'%';
+    if(p>mi*25&&mi<msgs.length){txt.textContent=msgs[mi];mi++;}
+  },300);
+  window._progIv=iv;
+}
+
+async function llamarIA(imageBase64,apiKey){
+  clearInterval(window._progIv);
+  document.getElementById('progressFill').style.width='95%';
+  document.getElementById('progressTxt').textContent='Finalizando...';
+
+  const base64=imageBase64.split(',')[1];
+  const prompt=`Eres un asistente que extrae datos de planillas de producción de obleas (FR-PRO-OB-01).
+Analiza la imagen y extrae TODOS los datos visibles. Responde SOLO con un JSON válido, sin texto adicional, con esta estructura exacta:
+
+{
+  "fecha": "YYYY-MM-DD o vacío. El año actual es 2026.",
+  "lote": "número de lote o vacío",
+  "hora_ingreso": "HH:MM o vacío",
+  "hora_salida": "HH:MM o vacío",
+  "maquinero_m1": "nombre escrito en celda MAQUINERO MAQ 1 o vacío",
+  "cortador_m1": "nombre escrito en celda CORTADOR MAQ 1 o vacío",
+  "masero_m1": "nombre escrito en celda MASERO MAQ 1 o vacío",
+  "maquinero_m2": "nombre escrito en celda MAQUINERO MAQ 2 o vacío",
+  "cortador_m2": "nombre escrito en celda CORTADOR MAQ 2 o vacío",
+  "maquinero_m3": "nombre escrito en celda MAQUINERO MAQ 3 o vacío",
+  "cortador_m3": "nombre escrito en celda CORTADOR MAQ 3 o vacío",
+  "masero_m3": "nombre escrito en celda MASERO MAQ 3 o vacío",
+  "supervisor": "vacío",
+  "gas_inicial": número o 0,
+  "gas_final": número o 0,
+  "harina_ini_t1": "Harina inicial TURNO 1 en kg. Si ves 37775 escribe 37.775. Si vacío: 0",
+  "harina_adi_t1": "Harina Adicional TURNO 1 en kg. Misma regla. Si vacío: 0",
+  "harina_fin_t1": "Harina Final TURNO 1 en kg. Misma regla. Si vacío: 0",
+  "harina_ini_t2": "Harina inicial TURNO 2 en kg. Misma regla. Si vacío: 0",
+  "harina_adi_t2": "Harina Adicional TURNO 2 en kg. Misma regla. Si vacío: 0",
+  "harina_fin_t2": "Harina Final TURNO 2 en kg. Misma regla. Si vacío: 0",
+  "masas": [
+    {"n":1,"harina":0,"obleas_m1":0,"obleas_m2":0,"obleas_m3":0,"combos_m1":0,"combos_m2":0,"combos_m3":0,"obs":""},
+    ... una entrada por cada fila con datos. Columnas en orden exacto: Harina usada (kg), Obleas maquina 1 (grande), Obleas maquina 2 (pequeña), Obleas maquina 3 (grande), COMBOS MAQUINA 1, COMBOS MAQUINA 2, COMBOS MAQUINA 3, OBSERVACIONES.
+  ],
+  "observaciones": "texto de observaciones generales o vacío"
+}
+
+REGLAS CRÍTICAS — OPERARIOS:
+1. Lee ÚNICAMENTE el nombre escrito en cada celda. Si la celda está vacía devuelve "".
+2. NO copies nombres entre máquinas. Cada campo corresponde EXACTAMENTE a su celda.
+3. VALIDACIÓN OBLIGATORIA: antes de devolver los operarios, revisa la tabla de masas:
+   - Si la columna "Obleas maquina 1" tiene todos los valores en 0 o vacíos → maquinero_m1="", cortador_m1="", masero_m1=""
+   - Si la columna "Obleas maquina 2" tiene todos los valores en 0 o vacíos → maquinero_m2="", cortador_m2=""
+   - Si la columna "Obleas maquina 3" tiene todos los valores en 0 o vacíos → maquinero_m3="", cortador_m3="", masero_m3=""
+4. Ejemplo: si solo M1 y M2 produjeron obleas, M3 debe tener maquinero_m3="", cortador_m3="", masero_m3="" sin importar lo que veas escrito en esas celdas.
+5. Los únicos nombres posibles: Yasir (MAQ1), Jairo (MAQ1), Angie (MAQ1), Fabian (MAQ2), Karolay (MAQ2), Benjamin (MAQ3), Karolina (MAQ3), Carlos (MAQ3).
+6. Si ves un nombre escrito pero su máquina no produjo nada en la tabla → ese campo va vacío "".
+
+REGLAS CRÍTICAS — HARINA:
+1. El formato tiene DOS turnos. Turno 1: harina_ini_t1, harina_adi_t1, harina_fin_t1. Turno 2: harina_ini_t2, harina_adi_t2, harina_fin_t2.
+2. Si solo hubo un turno, los campos de Turno 2 quedan en 0.
+3. Regla decimal: si ves 37775 escribe 37.775 (divide entre 1000). Si ves 37.775 úsalo tal cual.
+4. NUNCA devuelvas un valor mayor a 500 — si es mayor a 500 divídelo entre 1000.
+
+Si un valor no es legible o está vacío usa 0 para números y "" para texto. Año siempre 2026 si ves "26" o "25".`;
+
+  // Try direct first, then fallback proxy
+  const body=JSON.stringify({
+    model:'claude-sonnet-4-5',
+    max_tokens:2000,
+    messages:[{role:'user',content:[
+      {type:'image',source:{type:'base64',media_type:'image/jpeg',data:base64}},
+      {type:'text',text:prompt}
+    ]}]
+  });
+
+  let resp;
+  // Try direct with browser access header
+  try{
+    resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body
+    });
+  }catch(e1){
+    // Fallback: use corsproxy.io
+    try{
+      resp=await fetch('https://corsproxy.io/?https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01'},
+        body
+      });
+    }catch(e2){
+      throw new Error('No se pudo conectar. Verifica tu internet.');
+    }
+  }
+
+  if(!resp.ok){
+    const err=await resp.json().catch(()=>({}));
+    if(resp.status===401)throw new Error('Clave de API incorrecta. Verifícala en ⚙️ Config.');
+    if(resp.status===429)throw new Error('Límite de uso alcanzado. Intenta en unos minutos.');
+    if(resp.status===403)throw new Error('Sin créditos. Recarga en console.anthropic.com');
+    throw new Error('Error '+(resp.status||'')+(err&&err.error&&err.error.message?': '+err.error.message:''));
+  }
+
+  const data=await resp.json();
+  const texto=data.content[0].text.trim();
+  const jsonMatch=texto.match(/\{[\s\S]*\}/);
+  if(!jsonMatch)throw new Error('La IA no pudo leer la planilla. Intenta con mejor iluminación.');
+  return JSON.parse(jsonMatch[0]);
+}
+
+function mostrarResultadoIA(datos){
+  clearInterval(window._progIv);
+  document.getElementById('progressFill').style.width='100%';
+  document.getElementById('progressTxt').textContent='¡Listo!';
+
+  // Validar operarios contra producción real: si una máquina no produjo nada, limpiar sus operarios
+  if(datos.masas&&datos.masas.length){
+    const totM1=datos.masas.reduce((s,m)=>s+(m.obleas_m1||0),0);
+    const totM2=datos.masas.reduce((s,m)=>s+(m.obleas_m2||0),0);
+    const totM3=datos.masas.reduce((s,m)=>s+(m.obleas_m3||0),0);
+    if(totM1===0){datos.maquinero_m1='';datos.cortador_m1='';datos.masero_m1='';}
+    if(totM2===0){datos.maquinero_m2='';datos.cortador_m2='';}
+    if(totM3===0){datos.maquinero_m3='';datos.cortador_m3='';datos.masero_m3='';}
+  }
+  const area=document.getElementById('scanArea');
+  area.classList.remove('scanning');area.classList.add('done');
+  document.getElementById('scanIco').textContent='✅';
+  document.getElementById('scanTitle').textContent='Planilla leída correctamente';
+  document.getElementById('scanSub').textContent='Revisa los datos abajo y guarda';
+
+  // Mostrar resumen IA
+  const rf=document.getElementById('aiFields');
+  const masasTot=datos.masas?datos.masas.reduce((s,m)=>s+m.obleas_m1+m.obleas_m2+m.obleas_m3,0):0;
+  rf.innerHTML=`
+    <div class="ai-field"><div class="ai-field-l">Fecha</div><div class="ai-field-v">${datos.fecha||'—'}</div></div>
+    <div class="ai-field"><div class="ai-field-l">Ops M1</div><div class="ai-field-v">${[datos.maquinero_m1,datos.cortador_m1,datos.masero_m1].filter(Boolean).join(', ')||'—'}</div></div>
+    <div class="ai-field"><div class="ai-field-l">Ops M2/M3</div><div class="ai-field-v">${[datos.maquinero_m2,datos.cortador_m2,datos.maquinero_m3,datos.cortador_m3,datos.masero_m3].filter(Boolean).join(', ')||'—'}</div></div>
+    <div class="ai-field"><div class="ai-field-l">Gas consumido</div><div class="ai-field-v">${(datos.gas_final-datos.gas_inicial).toFixed(1)} m³</div></div>
+    <div class="ai-field"><div class="ai-field-l">Harina turno</div><div class="ai-field-v">${((datos.harina_turno1||0)+(datos.harina_turno2||0)).toFixed(2)} kg</div></div>
+    <div class="ai-field"><div class="ai-field-l">Harina adicional</div><div class="ai-field-v">${(parseFloat(datos.harina_adicional)||0)>0?((parseFloat(datos.harina_adicional)||0)).toFixed(3)+' kg':'—'}</div></div>
+    <div class="ai-field"><div class="ai-field-l">Masas leídas</div><div class="ai-field-v">${datos.masas?datos.masas.length:0}</div></div>
+    <div class="ai-field"><div class="ai-field-l">Total obleas</div><div class="ai-field-v">${masasTot.toLocaleString('es-CO')}</div></div>`;
+  document.getElementById('aiResult').style.display='block';
+
+  // Llenar formulario
+  const set=(id,v)=>{const el=document.getElementById(id);if(el&&v){el.value=v;el.classList.add('ai-filled');}};
+  if(datos.fecha)datos.fecha=normFecha(datos.fecha);
+  set('s-fecha',datos.fecha);set('s-lote',datos.lote);
+  set('s-hing',datos.hora_ingreso);set('s-hsal',datos.hora_salida);
+  // Mapeo por rol según formato FR-PRO-OB-01
+  set('s-op1',datos.maquinero_m1||datos.operario1);
+  set('s-op2',datos.cortador_m1||datos.operario2);
+  set('s-op3',datos.masero_m1||datos.operario3);
+  set('s-op4',datos.maquinero_m2||datos.operario4);
+  set('s-op5',datos.cortador_m2||datos.operario5);
+  set('s-op6',datos.maquinero_m3);
+  set('s-op7',datos.cortador_m3);
+  set('s-op8',datos.masero_m3);
+  set('s-sup',datos.supervisor);
+  // Resaltar en naranja campos que la IA dejó en 0
+  setTimeout(()=>{
+    ['s-gi','s-gf','s-ht1','s-ht2'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el&&!(parseFloat(el.value)>0)){
+        el.style.borderColor='#f59e0b';el.style.background='#fffbeb';
+        el.title='⚠️ La IA leyó 0 — verifica en la planilla';
+      }
+    });
+    for(let i=1;i<=22;i++){
+      const har=document.querySelector(`.smi[data-row="${i}"][data-f="har"]`);
+      if(har&&parseFloat(har.value)>0){
+        ['m1','m2','m3'].forEach(f=>{
+          const el=document.querySelector(`.smi[data-row="${i}"][data-f="${f}"]`);
+          if(el&&!(parseInt(el.value)>0)){el.style.borderColor='#f59e0b';el.style.background='#fffbeb';el.title='⚠️ Verifica';}
+        });
+      }
+    }
+  },300);
+  set('s-gi',datos.gas_inicial);set('s-gf',datos.gas_final);
+  const fixHar=v=>{const n=parseFloat(v)||0;return n>500?(n/1000).toFixed(3):(n?n.toFixed(3):'');};
+  // Mapear campos de harina turno 1 y turno 2
+  [['s-hi',datos.harina_ini_t1],['s-hf',datos.harina_fin_t1],
+   ['s-ht1',datos.harina_adi_t1],
+   ['s-hi2',datos.harina_ini_t2],['s-hf2',datos.harina_fin_t2],['s-ht2',datos.harina_adi_t2]
+  ].forEach(([id,v])=>{
+    const el=document.getElementById(id);if(el&&v!=null&&v!==''){el.value=fixHar(v);el.classList.add('ai-filled');}
+  });
+  set('s-obs',datos.observaciones);
+  calcAutosS();
+
+  // Masas
+  buildMasasS();
+  if(datos.masas){
+    datos.masas.forEach(m=>{
+      const setM=(f,v)=>{const el=document.querySelector(`.smi[data-row="${m.n}"][data-f="${f}"]`);if(el&&v){el.value=v;el.classList.add('ai-filled');}};
+      const mHarN=parseFloat(m.harina)||0;
+      const mHarFix=mHarN>500?(mHarN/1000).toFixed(3):(mHarN?mHarN.toFixed(3):'');
+      const elMHar=document.querySelector('.smi[data-row="'+m.n+'"][data-f="har"]');
+      if(elMHar&&mHarFix){elMHar.value=mHarFix;elMHar.classList.add('ai-filled');}setM('m1',m.obleas_m1);setM('m2',m.obleas_m2);setM('m3',m.obleas_m3);setM('c1',m.combos_m1);setM('c2',m.combos_m2);setM('c3',m.combos_m3);
+      const obs=document.querySelector(`input[data-row="${m.n}"][data-f="sobs"]`);
+      if(obs&&m.obs){obs.value=m.obs;obs.classList.add('ai-filled');}
+    });
+    sumMasasS();
+  }
+
+  document.getElementById('formScan').style.display='block';
+  document.querySelector('.pages').scrollTo(0,0);
+}
+
+function buildMasasS(){
+  const tb=document.getElementById('sMasaBody');tb.innerHTML='';
+  for(let i=1;i<=22;i++){
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td style="font-weight:700;color:var(--t2)">${i}</td>
+      ${['har','m1','m2','m3','c1','c2','c3'].map(f=>`<td><input type="number" class="smi" min="0" step="${f==='har'?'0.001':'1'}" data-row="${i}" data-f="${f}" oninput="sumMasasS()"></td>`).join('')}
+      <td><input type="text" placeholder="..." data-row="${i}" data-f="sobs" style="width:70px;padding:5px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:var(--bg2);color:var(--t)"></td>`;
+    tb.appendChild(tr);
+  }
+}
+function sumMasasS(){
+  const tots={har:0,m1:0,c1:0,m2:0,c2:0,m3:0,c3:0};
+  document.querySelectorAll('.smi').forEach(el=>{const v=parseFloat(el.value)||0;const f=el.dataset.f;if(f in tots)tots[f]+=v;});
+  document.getElementById('stHar').textContent=tots.har.toFixed(2);
+  ['m1','c1','m2','c2','m3','c3'].forEach(f=>{const id='st'+f.charAt(0).toUpperCase()+f.charAt(1);const el=document.getElementById(id);if(el)el.textContent=tots[f];});
+}
+function calcAutosS(){
+  const gi=parseFloat(document.getElementById('s-gi').value)||0;
+  const gf=parseFloat(document.getElementById('s-gf').value)||0;
+  document.getElementById('s-gcons').value=(gf-gi).toFixed(2);
+  // Harina: (HiT1 + HaT1 - HfT1) + (HiT2 + HaT2 - HfT2)
+  const hiT1=parseFloat(document.getElementById('s-hi').value)||0;
+  const haT1=parseFloat(document.getElementById('s-ht1').value)||0;
+  const hfT1=parseFloat(document.getElementById('s-hf').value)||0;
+  const hiT2=parseFloat(document.getElementById('s-hi2').value)||0;
+  const haT2=parseFloat(document.getElementById('s-ht2').value)||0;
+  const hfT2=parseFloat(document.getElementById('s-hf2').value)||0;
+  const consT1=(hiT1||hfT1)?Math.max(0,hiT1+haT1-hfT1):0;
+  const consT2=(hiT2||hfT2)?Math.max(0,hiT2+haT2-hfT2):0;
+  document.getElementById('s-hcons').value=(consT1+consT2).toFixed(3);
+}
+
+async function guardarScan(){
+  const fecha=normFecha(document.getElementById('s-fecha').value);
+  const op1=document.getElementById('s-op1').value.trim();
+  if(!fecha){showAlrt('scan','Por favor ingresa la fecha.','err');return;}
+  const tots={m1:parseInt(document.getElementById('stM1').textContent)||0,m2:parseInt(document.getElementById('stM2').textContent)||0,m3:parseInt(document.getElementById('stM3').textContent)||0};
+  const masas=getMasaDataS();
+  const reg={
+    fecha,lote:document.getElementById('s-lote').value,
+    hIng:document.getElementById('s-hing').value,hSal:document.getElementById('s-hsal').value,
+    op1,op2:document.getElementById('s-op2').value.trim(),
+    op3:document.getElementById('s-op3').value.trim(),
+    op4:document.getElementById('s-op4').value.trim(),
+    op5:document.getElementById('s-op5').value.trim(),
+    op6:document.getElementById('s-op6').value.trim(),
+    op7:document.getElementById('s-op7').value.trim(),
+    op8:document.getElementById('s-op8').value.trim(),
+    sup:document.getElementById('s-sup').value.trim(),
+    gasIni:parseFloat(document.getElementById('s-gi').value)||0,
+    gasFin:parseFloat(document.getElementById('s-gf').value)||0,
+    gasConsumo:parseFloat(document.getElementById('s-gcons').value)||0,
+    harIni:parseFloat(document.getElementById('s-hi').value)||0,
+    harAdiT1:parseFloat(document.getElementById('s-ht1').value)||0,
+    harFin:parseFloat(document.getElementById('s-hf').value)||0,
+    harIni2:parseFloat(document.getElementById('s-hi2').value)||0,
+    harAdiT2:parseFloat(document.getElementById('s-ht2').value)||0,
+    harFin2:parseFloat(document.getElementById('s-hf2').value)||0,
+    harTotal:parseFloat(document.getElementById('s-hcons').value)||0,
+    maq1:parseInt(document.getElementById('s-m1').value),
+    maq2:parseInt(document.getElementById('s-m2').value),
+    maq3:parseInt(document.getElementById('s-m3').value),
+    obs:document.getElementById('s-obs').value,
+    masas,totPaq:tots.m1+tots.m2+tots.m3,
+    totM1:tots.m1,totC1:parseInt(document.getElementById('stC1').textContent)||0,
+    totM2:tots.m2,totC2:parseInt(document.getElementById('stC2').textContent)||0,
+    totM3:tots.m3,totC3:parseInt(document.getElementById('stC3').textContent)||0,
+    foto:scanPhotoData,metodo:'IA',ts:new Date().toISOString()
+  };
+  await dbW(s=>s.add(reg));
+  showAlrt('scan','✅ Turno guardado con IA — '+(tots.m1+tots.m2+tots.m3)+' paquetes.','ok');
+  nuevaScan();
+}
+function getMasaDataS(){
+  const rows=[];
+  for(let i=1;i<=22;i++){
+    const g=f=>{const el=document.querySelector(`.smi[data-row="${i}"][data-f="${f}"]`);return parseFloat(el&&el.value)||0};
+    const obsEl=document.querySelector(`input[data-row="${i}"][data-f="sobs"]`);const obs=obsEl?obsEl.value:'';
+    const har=g('har');
+    if(har>0||g('m1')>0||g('m2')>0||g('m3')>0)rows.push({n:i,har,m1:g('m1'),c1:g('c1'),m2:g('m2'),c2:g('c2'),m3:g('m3'),c3:g('c3'),obs});
+  }
+  return rows;
+}
+function nuevaScan(){
+  scanPhotoData=null;
+  document.getElementById('aiResult').style.display='none';
+  document.getElementById('formScan').style.display='none';
+  document.getElementById('progressWrap').style.display='none';
+  document.getElementById('scanPreview').style.display='none';
+  document.getElementById('scanPreview').src='';
+  const area=document.getElementById('scanArea');
+  area.classList.remove('scanning','done');
+  document.getElementById('scanIco').textContent='📷';
+  document.getElementById('scanTitle').textContent='Toca para fotografiar la planilla';
+  document.getElementById('scanSub').textContent='La IA leerá los datos automáticamente';
+  document.getElementById('scanInput').value='';
+  // Limpiar TODOS los campos del formulario para que la siguiente foto parta de cero
+  ['s-fecha','s-lote','s-hing','s-hsal',
+   's-op1','s-op2','s-op3','s-op4','s-op5','s-op6','s-op7','s-op8','s-sup',
+   's-gi','s-gf','s-gcons','s-hi','s-ht1','s-hf','s-hi2','s-ht2','s-hf2','s-hcons','s-obs'
+  ].forEach(id=>{const el=document.getElementById(id);if(el){el.value='';el.classList.remove('ai-filled');}});
+  document.querySelectorAll('.smi').forEach(el=>{el.value='';el.classList.remove('ai-filled');});
+  document.querySelector('.pages').scrollTo(0,0);
+}
+  const area=document.getElementById('scanArea');
+  area.classList.remove('scanning','done');
+
+// ── INICIO DASHBOARD ─────────────────────────────────
+async function renderInicio(){
+  const todos=await getAll();
+  const hoy=new Date().toISOString().slice(0,10);
+  const mes=hoy.slice(0,7);
+  const hoyR=todos.filter(r=>r.fecha===hoy);
+  const mesR=todos.filter(r=>r.fecha.startsWith(mes));
+  const presup=parseFloat((document.getElementById('cs-presup')||{}).value)||6200;
+  const fmt=v=>'$'+Math.round(v).toLocaleString('es-CO');
+  const fmtN=v=>Math.round(v).toLocaleString('es-CO');
+
+  // ── TOTALES DEL MES ───────────────────────────────────
+  const paqMesM1=mesR.reduce((s,r)=>s+r.totM1,0);
+  const paqMesM2=mesR.reduce((s,r)=>s+r.totM2,0);
+  const paqMesM3=mesR.reduce((s,r)=>s+r.totM3,0);
+  const paqMes=paqMesM1+paqMesM2+paqMesM3;
+  const harMes=mesR.reduce((s,r)=>s+(r.harTotal||0),0);
+  const gasMes=mesR.reduce((s,r)=>s+(r.gasConsumo||0),0);
+
+  // Costo real promedio mes (calculado día a día para incluir MO correctamente)
+  const diasMes={};
+  mesR.forEach(r=>{
+    const d=r.fecha;
+    if(!diasMes[d])diasMes[d]={paq:0,har:0,gas:0,m1:0,m2:0,m3:0,c1:0,c2:0,c3:0,ops:[]};
+    diasMes[d].paq+=r.totM1+r.totM2+r.totM3;
+    diasMes[d].har+=r.harTotal||0;
+    diasMes[d].gas+=r.gasConsumo||0;
+    if(r.maq1)diasMes[d].m1=1;
+    if(r.maq2)diasMes[d].m2=1;
+    if(r.maq3)diasMes[d].m3=1;
+    diasMes[d].c1+=(r.totC1||0);diasMes[d].c2+=(r.totC2||0);diasMes[d].c3+=(r.totC3||0);
+    [r.op1,r.op2,r.op3,r.op4,r.op5,r.op6,r.op7,r.op8].filter(Boolean).forEach(function(op){if(diasMes[d].ops.indexOf(op)<0)diasMes[d].ops.push(op);});
+  });
+  const costosDias=Object.values(diasMes).filter(d=>d.paq>0).map(d=>calcCostoVal(d.paq,d.har,d.gas,d.m1,d.m2,d.m3,d.ops,d.c1,d.c2,d.c3));
+  const costoPromMes=costosDias.length?costosDias.reduce((a,b)=>a+b,0)/costosDias.length:0;
+  const grHarPromMes=paqMes>0?(harMes/paqMes*1000):0;
+  const gasPromMes=paqMes>0?(gasMes/paqMes):0;
+
+  // ── TOTALES DE HOY ─────────────────────────────────────
+  const paqHoyM1=hoyR.reduce((s,r)=>s+r.totM1,0);
+  const paqHoyM2=hoyR.reduce((s,r)=>s+r.totM2,0);
+  const paqHoyM3=hoyR.reduce((s,r)=>s+r.totM3,0);
+  const paqHoy=paqHoyM1+paqHoyM2+paqHoyM3;
+  const harHoy=hoyR.reduce((s,r)=>s+(r.harTotal||0),0);
+  const gasHoy=hoyR.reduce((s,r)=>s+(r.gasConsumo||0),0);
+  const m1Hoy=hoyR.some(r=>r.maq1)?1:0;
+  const m2Hoy=hoyR.some(r=>r.maq2)?1:0;
+  const m3Hoy=hoyR.some(r=>r.maq3)?1:0;
+  const opsHoy=[];hoyR.forEach(r=>{[r.op1,r.op2,r.op3,r.op4,r.op5,r.op6,r.op7,r.op8].filter(Boolean).forEach(function(op){if(opsHoy.indexOf(op)<0)opsHoy.push(op);});});
+  const c1Hoy=hoyR.reduce((s,r)=>s+(r.totC1||0),0);const c2Hoy=hoyR.reduce((s,r)=>s+(r.totC2||0),0);const c3Hoy=hoyR.reduce((s,r)=>s+(r.totC3||0),0);
+  const costoHoy=paqHoy>0?calcCostoVal(paqHoy,harHoy,gasHoy,m1Hoy,m2Hoy,m3Hoy,opsHoy,c1Hoy,c2Hoy,c3Hoy):0;
+  const diffHoy=costoHoy>0?costoHoy-presup:0;
+  const okHoy=costoHoy<=presup||costoHoy===0;
+
+  // ── KPI MES ────────────────────────────────────────────
+  document.getElementById('kpi-mes-paq').innerHTML=
+    '<div class="kpi"><div class="kpi-l">Total mes</div><div class="kpi-v">'+fmtN(paqMes)+'<span class="kpi-u"> paq</span></div></div>'+
+    '<div class="kpi am"><div class="kpi-l">Máquina 1</div><div class="kpi-v">'+fmtN(paqMesM1)+'<span class="kpi-u"> paq</span></div></div>'+
+    '<div class="kpi am"><div class="kpi-l">Máquina 2</div><div class="kpi-v">'+fmtN(paqMesM2)+'<span class="kpi-u"> paq</span></div></div>'+
+    '<div class="kpi am"><div class="kpi-l">Máquina 3</div><div class="kpi-v">'+fmtN(paqMesM3)+'<span class="kpi-u"> paq</span></div></div>';
+
+  // ── KPI HOY ────────────────────────────────────────────
+  document.getElementById('kpi-hoy-paq').innerHTML=
+    '<div class="kpi"><div class="kpi-l">Total hoy</div><div class="kpi-v">'+fmtN(paqHoy)+'<span class="kpi-u"> paq</span></div></div>'+
+    '<div class="kpi '+(paqHoyM1>0?'am':'')+'"><div class="kpi-l">Máquina 1</div><div class="kpi-v">'+fmtN(paqHoyM1)+'<span class="kpi-u"> paq</span></div></div>'+
+    '<div class="kpi '+(paqHoyM2>0?'am':'')+'"><div class="kpi-l">Máquina 2</div><div class="kpi-v">'+fmtN(paqHoyM2)+'<span class="kpi-u"> paq</span></div></div>'+
+    '<div class="kpi '+(paqHoyM3>0?'am':'')+'"><div class="kpi-l">Máquina 3</div><div class="kpi-v">'+fmtN(paqHoyM3)+'<span class="kpi-u"> paq</span></div></div>';
+
+  // ── PROMEDIOS DEL MES ──────────────────────────────────
+  const diffMes=costoPromMes>0?costoPromMes-presup:0;
+  const okMes=costoPromMes<=presup||costoPromMes===0;
+  document.getElementById('kpi-promedios').innerHTML=
+    '<div class="kpi"><div class="kpi-l">Gr harina / paq (mes)</div><div class="kpi-v">'+grHarPromMes.toFixed(0)+'<span class="kpi-u"> g</span></div></div>'+
+    '<div class="kpi"><div class="kpi-l">Gas / paq (mes)</div><div class="kpi-v">'+gasPromMes.toFixed(4)+'<span class="kpi-u"> m³</span></div></div>'+
+    '<div class="kpi '+(okMes?'':'rd')+'"><div class="kpi-l">Costo prom/paq (mes)</div><div class="kpi-v">'+(costoPromMes>0?fmt(costoPromMes):'—')+'</div><div style="font-size:10px;margin-top:3px;color:'+(okMes?'var(--gr)':'var(--rd)')+'">Presup: '+fmt(presup)+' '+(costoPromMes>0?(okMes?'✅':'⚠️ +'+(diffMes>0?fmtN(diffMes):'0')):'')+'</div></div>'+
+    '<div class="kpi '+(okHoy?'':'rd')+'"><div class="kpi-l">Costo prom/paq (hoy)</div><div class="kpi-v">'+(costoHoy>0?fmt(costoHoy):'—')+'</div><div style="font-size:10px;margin-top:3px;color:'+(okHoy?'var(--gr)':'var(--rd)')+'">Presup: '+fmt(presup)+' '+(costoHoy>0?(okHoy?'✅':'⚠️ +'+(diffHoy>0?fmtN(diffHoy):'0')):'')+'</div></div>';
+
+  // ── ÚLTIMOS TURNOS ─────────────────────────────────────
+  // Agrupar por día: MO es costo diario, no por turno
+  const diasUlt={};
+  [...todos].sort((a,b)=>normFecha(b.fecha).localeCompare(normFecha(a.fecha))||((b.ts||'').localeCompare(a.ts||''))).forEach(r=>{
+    const d=normFecha(r.fecha);
+    if(!diasUlt[d])diasUlt[d]={fecha:d,m1:0,m2:0,m3:0,c1:0,c2:0,c3:0,har:0,gas:0,ops:[]};
+    diasUlt[d].m1+=r.totM1;diasUlt[d].m2+=r.totM2;diasUlt[d].m3+=r.totM3;
+    diasUlt[d].c1+=(r.totC1||0);diasUlt[d].c2+=(r.totC2||0);diasUlt[d].c3+=(r.totC3||0);
+    diasUlt[d].har+=r.harTotal||0;diasUlt[d].gas+=r.gasConsumo||0;
+    [r.op1,r.op2,r.op3,r.op4,r.op5,r.op6,r.op7,r.op8].filter(Boolean).forEach(function(op){if(diasUlt[d].ops.indexOf(op)<0)diasUlt[d].ops.push(op);});
+  });
+  const ultDias=Object.values(diasUlt).slice(0,8);
+  if(!ultDias.length){
+    document.getElementById('ultimos-turnos').innerHTML='<p style="font-size:12px;color:var(--t2);text-align:center;padding:16px">Sin turnos registrados aún.</p>';
+    return;
+  }
+  document.getElementById('ultimos-turnos').innerHTML=
+    '<div style="overflow-x:auto">'+
+    '<table class="rt" style="min-width:560px">'+
+    '<thead><tr>'+
+      '<th>Fecha</th><th>M1</th><th>M2</th><th>M3</th><th>Total</th>'+
+      '<th>Gas m³</th><th>Harina kg</th><th>g/paq</th>'+
+      '<th>$/paq real</th><th>$/paq presup</th><th>Diferencia</th>'+
+    '</tr></thead><tbody>'+
+    ultDias.map(d=>{
+      const p=d.m1+d.m2+d.m3;
+      const c=p?Math.round(calcCostoVal(p,d.har,d.gas,d.m1>0?1:0,d.m2>0?1:0,d.m3>0?1:0,d.ops,d.c1,d.c2,d.c3)):0;
+      const paqEqD=p+((d.c1||0)+(d.c2||0)+(d.c3||0))*(20/50);const grPaq=paqEqD>0?Math.round(d.har/paqEqD*1000):0;
+      const diff=c-presup;
+      const okR=diff<=0;
+      return '<tr>'+
+        '<td style="white-space:nowrap">'+d.fecha+'</td>'+
+        '<td>'+d.m1+'</td>'+
+        '<td>'+d.m2+'</td>'+
+        '<td>'+d.m3+'</td>'+
+        '<td style="font-weight:700">'+p.toLocaleString('es-CO')+'</td>'+
+        '<td>'+d.gas.toFixed(2)+'</td>'+
+        '<td>'+d.har.toFixed(2)+'</td>'+
+        '<td>'+grPaq+'</td>'+
+        '<td><span class="badge bok">'+fmt(c)+'</span></td>'+
+        '<td><span class="badge bw">'+fmt(presup)+'</span></td>'+
+        '<td style="font-weight:700;color:'+(okR?'var(--gr)':'var(--rd)')+'">'+
+          (diff===0?'=':(diff>0?'+':'')+fmt(diff))+
+        '</td>'+
+      '</tr>';
+    }).join('')+
+    '</tbody></table></div>';
+}
+
+// ── MANUAL ───────────────────────────────────────────
+const CKS=['Limpieza de mesas y superficies','Limpieza de máquinas','Orden de insumos y materiales','Limpieza de pisos','Manejo adecuado de residuos','Lavado de utensilios'];
+function buildMasas(){const tb=document.getElementById('masaBody');tb.innerHTML='';for(let i=1;i<=22;i++){const tr=document.createElement('tr');tr.innerHTML=`<td style="font-weight:700;color:var(--t2)">${i}</td>${['har','m1','m2','m3','c1','c2','c3'].map(f=>`<td><input type="number" class="mi" min="0" step="${f==='har'?'0.001':'1'}" inputmode="${f==='har'?'decimal':'numeric'}" data-row="${i}" data-f="${f}" oninput="sumMasas()"></td>`).join('')}<td><input type="text" placeholder="..." data-row="${i}" data-f="obs" style="width:70px;padding:5px;border:1px solid var(--bd);border-radius:4px;font-size:11px;background:var(--bg2);color:var(--t)"></td>`;tb.appendChild(tr);}}
+function sumMasas(){const tots={har:0,m1:0,c1:0,m2:0,c2:0,m3:0,c3:0};document.querySelectorAll('.mi').forEach(el=>{const v=parseFloat(el.value)||0;const f=el.dataset.f;if(f in tots)tots[f]+=v;});document.getElementById('tHar').textContent=tots.har.toFixed(2);['m1','c1','m2','c2','m3','c3'].forEach(f=>{const id='t'+f.charAt(0).toUpperCase()+f.charAt(1);const el=document.getElementById(id);if(el)el.textContent=tots[f];});}
+function buildChecklist(){document.getElementById('chklist').innerHTML=CKS.map((t,i)=>`<label class="ck-item" for="ck-${i}"><input type="checkbox" id="ck-${i}" onchange="this.closest('.ck-item').classList.toggle('checked',this.checked)" style="width:18px;height:18px;accent-color:var(--gr)"><span>${t}</span></label>`).join('');}
+function calcAutosM(){const gi=parseFloat(document.getElementById('m-gi').value)||0;const gf=parseFloat(document.getElementById('m-gf').value)||0;document.getElementById('m-gcons').value=(gf-gi).toFixed(2);const hi=parseFloat(document.getElementById('m-hi').value)||0;const hf=parseFloat(document.getElementById('m-hf').value)||0;const hadc=parseFloat(document.getElementById('m-hadc').value)||0;if(hi>0&&hf>0){document.getElementById('m-hcons').value=(hi+hadc-hf).toFixed(3);}else{const ht1=parseFloat(document.getElementById('m-ht1').value)||0;const ht2=parseFloat(document.getElementById('m-ht2').value)||0;document.getElementById('m-hcons').value=(ht1+ht2+hadc).toFixed(3);}}
+function getMasaData(){const rows=[];for(let i=1;i<=22;i++){const g=f=>{const el=document.querySelector(`.mi[data-row="${i}"][data-f="${f}"]`);return parseFloat(el&&el.value)||0};const obsEl=document.querySelector(`input[data-row="${i}"][data-f="obs"]`);const obs=obsEl?obsEl.value:'';const har=g('har');if(har>0||g('m1')>0||g('m2')>0||g('m3')>0)rows.push({n:i,har,m1:g('m1'),c1:g('c1'),m2:g('m2'),c2:g('c2'),m3:g('m3'),c3:g('c3'),obs});}return rows;}
+async function guardarManual(){const fecha=normFecha(document.getElementById('e-fecha').value);const op1=document.getElementById('e-op1').value.trim();if(!fecha){showAlrt('manual','Por favor ingresa la fecha.','err');return;}if(!op1){showAlrt('manual','Por favor ingresa el operario.','err');return;}const tots={m1:parseInt(document.getElementById('tM1').textContent)||0,m2:parseInt(document.getElementById('tM2').textContent)||0,m3:parseInt(document.getElementById('tM3').textContent)||0};const reg={fecha,lote:document.getElementById('e-lote').value,hIng:document.getElementById('e-hing').value,hSal:document.getElementById('e-hsal').value,op1,op2:document.getElementById('e-op2').value.trim(),op3:document.getElementById('e-op3').value.trim(),op4:document.getElementById('e-op4').value.trim(),op5:document.getElementById('e-op5').value.trim(),op6:document.getElementById('e-op6').value.trim(),op7:document.getElementById('e-op7').value.trim(),op8:document.getElementById('e-op8').value.trim(),sup:document.getElementById('e-sup').value.trim(),gasIni:parseFloat(document.getElementById('m-gi').value)||0,gasFin:parseFloat(document.getElementById('m-gf').value)||0,gasConsumo:parseFloat(document.getElementById('m-gcons').value)||0,harIni:parseFloat(document.getElementById('m-hi').value)||0,harFin:parseFloat(document.getElementById('m-hf').value)||0,harT1:parseFloat(document.getElementById('m-ht1').value)||0,harT2:parseFloat(document.getElementById('m-ht2').value)||0,harAdc:parseFloat(document.getElementById('m-hadc').value)||0,harTotal:parseFloat(document.getElementById('m-hcons').value)||0,maq1:parseInt(document.getElementById('e-m1').value),maq2:parseInt(document.getElementById('e-m2').value),maq3:parseInt(document.getElementById('e-m3').value),obs:document.getElementById('e-obs').value,masas:getMasaData(),totPaq:tots.m1+tots.m2+tots.m3,totM1:tots.m1,totC1:parseInt(document.getElementById('tC1').textContent)||0,totM2:tots.m2,totC2:parseInt(document.getElementById('tC2').textContent)||0,totM3:tots.m3,totC3:parseInt(document.getElementById('tC3').textContent)||0,metodo:'manual',ts:new Date().toISOString()};await dbW(s=>s.add(reg));showAlrt('manual','✅ Turno guardado — '+(tots.m1+tots.m2+tots.m3)+' paquetes.','ok');limpiarManual();}
+function limpiarManual(){['e-fecha','e-lote','e-hing','e-hsal','e-op1','e-op2','e-op3','e-op4','e-op5','e-op6','e-op7','e-op8','e-sup','m-gi','m-gf','m-gcons','m-hi','m-hf','m-ht1','m-ht2','m-hcons','e-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});buildMasas();buildChecklist();document.getElementById('e-fecha').value=new Date().toISOString().slice(0,10);sumMasas();}
+
+// ── REGISTROS ────────────────────────────────────────
+async function renderRegs(){const todos=await getAll();const desde=document.getElementById('r-d').value;const hasta=document.getElementById('r-h').value;
+// Agrupar por día — MO y costos fijos son diarios
+const diasReg={};
+todos.forEach(r=>{
+  if(r.foto)fotosMap[r.id]=r.foto;
+  const rf=normFecha(r.fecha);
+  if(desde&&rf<desde)return;if(hasta&&rf>hasta)return;
+  if(!diasReg[rf])diasReg[rf]={fecha:rf,lote:r.lote||'',m1:0,m2:0,m3:0,c1:0,c2:0,c3:0,har:0,gas:0,ops:[],ids:[],foto:r.foto||null};
+  diasReg[rf].m1+=r.totM1;diasReg[rf].m2+=r.totM2;diasReg[rf].m3+=r.totM3;
+  diasReg[rf].c1+=(r.totC1||0);diasReg[rf].c2+=(r.totC2||0);diasReg[rf].c3+=(r.totC3||0);
+  diasReg[rf].har+=r.harTotal||0;diasReg[rf].gas+=r.gasConsumo||0;
+  if(r.foto)diasReg[rf].foto=r.foto;
+  [r.op1,r.op2,r.op3,r.op4,r.op5,r.op6,r.op7,r.op8].filter(Boolean).forEach(function(op){if(diasReg[rf].ops.indexOf(op)<0)diasReg[rf].ops.push(op);});
+  diasReg[rf].ids.push(r.id);
+});
+const dias=Object.values(diasReg).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+const w=document.getElementById('regsWrap');
+if(!dias.length){w.innerHTML='<div class="empty">📭<br>Sin registros para el período.</div>';return;}
+w.innerHTML=`<div class="twrap"><table class="rt"><thead><tr><th>Fecha</th><th>M1</th><th>M2</th><th>M3</th><th>Paq</th><th>Har kg</th><th>g/paq</th><th>MO/paq</th><th>$/paq</th><th>Foto</th><th></th></tr></thead><tbody>${dias.map(d=>{const p=d.m1+d.m2+d.m3;const c=p?Math.round(calcCostoVal(p,d.har,d.gas,d.m1>0?1:0,d.m2>0?1:0,d.m3>0?1:0,d.ops,d.c1,d.c2,d.c3)):0;const paqEqR=p+((d.c1||0)+(d.c2||0)+(d.c3||0))*(20/50);const gPaq=paqEqR>0?Math.round(d.har/paqEqR*1000):0;const moTotal=calcMOporOps(d.ops);const moPaq=p?Math.round(moTotal/p):0;return`<tr><td>${d.fecha}</td><td>${d.m1}</td><td>${d.m2}</td><td>${d.m3}</td><td style="font-weight:700">${p}</td><td>${d.har.toFixed(1)}</td><td><span class="badge bw">${gPaq}g</span></td><td><span class="badge bw">$${moPaq.toLocaleString('es-CO')}</span></td><td><span class="badge bok">$${c.toLocaleString('es-CO')}</span></td><td>${d.foto?`<img src="${d.foto}" class="thumb" onclick="openLbFoto('${d.foto}')" alt="Planilla">`:'—'}</td><td><button onclick="delDia('${d.fecha}')" style="background:none;border:none;cursor:pointer;font-size:16px;padding:4px">🗑</button></td></tr>`;}).join('')}</tbody></table></div><p style="font-size:11px;color:var(--t2);margin-top:8px">${dias.length} día(s) · ${dias.reduce((s,d)=>s+d.m1+d.m2+d.m3,0).toLocaleString('es-CO')} paquetes</p>`;}
+function openLb(id){if(fotosMap[id]){document.getElementById('lbImg').src=fotosMap[id];document.getElementById('lb').classList.add('open');}}
+function openLbFoto(src){if(src){document.getElementById('lbImg').src=src;document.getElementById('lb').classList.add('open');}}
+function closeLb(){document.getElementById('lb').classList.remove('open');}
+async function delDia(fecha){
+  if(!confirm('¿Eliminar todos los registros de '+fecha+'?'))return;
+  const arr=getTurnos().filter(r=>normFecha(r.fecha)!==fecha);
+  saveTurnos(arr);fotosMap={};
+  const csOps=document.getElementById('cs-ops');if(csOps)csOps.value='';
+  renderInicio();renderRegs();updDbInf();
+}
+async function delReg(id){if(!confirm('¿Eliminar este registro?'))return;const arr=getTurnos().filter(r=>r.id!==id);saveTurnos(arr);delete fotosMap[id];renderRegs();}
+
+// ── COSTOS ───────────────────────────────────────────
+function calcMOporOps(ops){
+  var total=0;
+  var usados=[];
+  (ops||[]).forEach(function(nombre){
+    if(!nombre)return;
+    var n=nombre.toLowerCase().trim();
+    // 1. Exacto
+    var found=WORKERS.find(function(w){return w.nombre.toLowerCase()===n;});
+    // 2. El nombre del registro empieza con el nombre del worker (min 5 chars)
+    if(!found&&n.length>=5) found=WORKERS.find(function(w){return w.nombre.toLowerCase().startsWith(n.slice(0,5));});
+    // 3. El nombre del worker empieza con lo que escribió el OCR (min 5 chars)
+    if(!found&&n.length>=5) found=WORKERS.find(function(w){return n.startsWith(w.nombre.toLowerCase().slice(0,5));});
+    if(found&&usados.indexOf(found.nombre)<0){
+      usados.push(found.nombre);
+      total+=getWorkerPago(found.nombre);
+    }
+  });
+  return total;
+}
+function calcCostoVal(paq,harKg,gasCons,m1,m2,m3,ops,comb1,comb2,comb3){if(!paq)return 0;const paqEq=paq+((comb1||0)+(comb2||0)+(comb3||0))*(20/50);const cHar=paqEq>0?(harKg*(cfg.bulto/50))/paqEq:(harKg*(cfg.bulto/50))/paq;const cFij=cfg.lec+cfg.adi+cfg.ades+cfg.ico+cfg.bol;const cGas=(gasCons*cfg.mgas)/paq;var moT;if(ops&&ops.length){moT=calcMOporOps(ops);}else{moT=(m1?(cfg.maq1m+cfg.maq1c+cfg.maq1ma):0)+(m2?(cfg.maq2m+cfg.maq2c):0)+(m3?(cfg.maq3m+cfg.maq3c+cfg.maq3ma):0);}const cMO=moT/paq;const cOtros=(cfg.gas2+cfg.jona+cfg.guan+cfg.cin+cfg.caj+cfg.arr)/20/paq;const cArrSvc=(cfg.arrs/20)/paq;return cHar+cFij+cGas+cMO+cOtros+cArrSvc;}
+async function cargarDiaCosto(){
+  const fecha=normFecha(document.getElementById('cs-fecha').value);
+  if(!fecha)return;
+  
+  
+  const todos=await getAll();
+  const turnos=todos.filter(r=>normFecha(r.fecha)===fecha);
+  if(!turnos.length){
+    document.getElementById('cs-resumen').innerHTML='<span style="color:var(--rd)">No hay turnos guardados para esta fecha.</span>';
+    document.getElementById('cs-paq').value=0;
+    document.getElementById('cs-har').value=0;
+    document.getElementById('cs-gas').value=0;
+    const csOps=document.getElementById('cs-ops');if(csOps)csOps.value='';
+    calcCosto();return;
+  }
+  // Sumar todos los turnos del día
+  const totPaq=turnos.reduce((s,r)=>s+(r.totM1+r.totM2+r.totM3),0);
+  const totHar=turnos.reduce((s,r)=>s+(r.harTotal||0),0);
+  const totGas=turnos.reduce((s,r)=>s+(r.gasConsumo||0),0);
+  const totC1=turnos.reduce((s,r)=>s+(r.totC1||0),0);
+  const totC2=turnos.reduce((s,r)=>s+(r.totC2||0),0);
+  const totC3=turnos.reduce((s,r)=>s+(r.totC3||0),0);
+  const csC=document.getElementById('cs-combos');if(csC)csC.value=[totC1,totC2,totC3].join('|');
+  // MO se paga por día, no por turno — calcular una sola vez según máquinas activas en el día
+  const m1=turnos.some(r=>r.maq1)?1:0;
+  const m2=turnos.some(r=>r.maq2)?1:0;
+  const m3=turnos.some(r=>r.maq3)?1:0;
+  const opsDelDia=[...new Set(turnos.flatMap(r=>[r.op1,r.op2,r.op3,r.op4,r.op5,r.op6,r.op7,r.op8].filter(Boolean)))];
+  document.getElementById('cs-ops').value=opsDelDia.join('|');
+  // Set checkboxes
+  document.getElementById('cs-m1').checked=!!m1;
+  document.getElementById('cs-m2').checked=!!m2;
+  document.getElementById('cs-m3').checked=!!m3;
+  // Store MO total for use in calcCosto
+  
+  // Set values
+  document.getElementById('cs-paq').value=totPaq;
+  document.getElementById('cs-har').value=totHar.toFixed(3);
+  document.getElementById('cs-gas').value=totGas.toFixed(2);
+  // Show summary
+  const ops=[...new Set(turnos.flatMap(r=>[r.op1,r.op2,r.op3,r.op4,r.op5].filter(Boolean)))];
+  document.getElementById('cs-resumen').innerHTML=
+    `<strong>${turnos.length} turno(s)</strong> encontrado(s) para ${fecha}<br>`+
+    `Operarios: ${ops.join(', ')}<br>`+
+    `M1: ${turnos.reduce((s,r)=>s+r.totM1,0)} paq &nbsp;|&nbsp; M2: ${turnos.reduce((s,r)=>s+r.totM2,0)} paq &nbsp;|&nbsp; M3: ${turnos.reduce((s,r)=>s+r.totM3,0)} paq`;
+  calcCosto();
+}
+
+function calcCosto(){
+  const paq=parseInt(document.getElementById('cs-paq').value)||1;
+  const presup=parseFloat((document.getElementById('cs-presup')||{}).value)||6200;
+  const har=parseFloat(document.getElementById('cs-har').value)||0;
+  const gas=parseFloat(document.getElementById('cs-gas').value)||0;
+  const m1=document.getElementById('cs-m1').checked?1:0;
+  const m2=document.getElementById('cs-m2').checked?1:0;
+  const m3=document.getElementById('cs-m3').checked?1:0;
+  // Leer operarios del DOM (guardados por cargarDiaCosto) — nunca de un global
+  const opsRaw=(document.getElementById('cs-ops')||{value:''}).value;
+  const opsActuales=opsRaw?opsRaw.split('|').filter(Boolean):[];
+  const combRaw=((document.getElementById('cs-combos')||{value:'0|0|0'}).value||'0|0|0').split('|');
+  const cc1=parseFloat(combRaw[0])||0,cc2=parseFloat(combRaw[1])||0,cc3=parseFloat(combRaw[2])||0;
+  const paqEq=paq+(cc1+cc2+cc3)*(20/50);
+  const cHar=paqEq>0?(har*(cfg.bulto/50))/paqEq:(har*(cfg.bulto/50))/paq;
+  const cFij=cfg.lec+cfg.adi+cfg.ades+cfg.ico+cfg.bol;
+  const cGas=(gas*cfg.mgas)/paq;
+  const moT=opsActuales.length
+    ?calcMOporOps(opsActuales)
+    :((m1?(cfg.maq1m+cfg.maq1c+cfg.maq1ma):0)+(m2?(cfg.maq2m+cfg.maq2c):0)+(m3?(cfg.maq3m+cfg.maq3c+cfg.maq3ma):0));
+  const cMO=moT/paq;
+  const cOtros=(cfg.gas2+cfg.jona+cfg.guan+cfg.cin+cfg.caj+cfg.arr)/20/paq;
+  const cArrSvc=(cfg.arrs/20)/paq;
+  const total=cHar+cFij+cGas+cMO+cOtros+cArrSvc;
+  const fmt=v=>'$'+Math.round(v).toLocaleString('es-CO');
+  const fmtD=v=>'$'+Math.round(v).toLocaleString('es-CO');
+  document.getElementById('detCosto').innerHTML=`
+  <div class="stit">🧾 Desglose por paquete</div>
+  <div class="cost-row"><span class="cost-lbl">🌾 Harina (${har.toFixed(2)} kg × $${(cfg.bulto/50).toLocaleString('es-CO')}/kg ÷ ${paq} paq)</span><span class="cost-val">${fmt(cHar)}</span></div>
+  <div class="cost-row"><span class="cost-lbl">📦 Insumos fijos (lecitina+aditivos+adhesivo+icopor+bolsa)</span><span class="cost-val">${fmt(cFij)}</span></div>
+  <div class="cost-row"><span class="cost-lbl">🔥 Gas (${gas} m³ × $${cfg.mgas.toLocaleString('es-CO')} ÷ ${paq} paq)</span><span class="cost-val">${fmt(cGas)}</span></div>
+  <div class="cost-row"><span class="cost-lbl">👷 Mano de obra diaria ÷ ${paq} paq</span><span class="cost-val">${fmt(cMO)}</span></div>
+  <div class="cost-row" style="font-size:11px;color:var(--t3);padding:4px 0 8px;border:none">
+    ${m1?`M1: maq $${cfg.maq1m.toLocaleString('es-CO')}+cort $${cfg.maq1c.toLocaleString('es-CO')}+mas $${cfg.maq1ma.toLocaleString('es-CO')} `:''}
+    ${m2?`M2: maq $${cfg.maq2m.toLocaleString('es-CO')}+cort $${cfg.maq2c.toLocaleString('es-CO')} `:''}
+    ${m3?`M3: maq $${cfg.maq3m.toLocaleString('es-CO')}+cort $${cfg.maq3c.toLocaleString('es-CO')}+mas $${cfg.maq3ma.toLocaleString('es-CO')}`:''}
+  </div>
+  <div class="cost-row"><span class="cost-lbl">🏢 Otros fijos (gas+personal+guantes+cinta+cajas+arriendo) ÷ ${paq}</span><span class="cost-val">${fmt(cOtros)}</span></div>
+  <div class="cost-row"><span class="cost-lbl">🏠 Arriendo+servicios ($${cfg.arrs.toLocaleString('es-CO')}/mes ÷ 30 días ÷ ${paq} paq)</span><span class="cost-val">${fmt(cArrSvc)}</span></div>
+  <div class="cost-tot"><span class="cost-lbl">Costo real por paquete</span><span class="cost-val">${fmt(total)}</span></div>
+  <div class="psug"><div class="psug-l">Precio mínimo sugerido (+30% margen)</div><div class="psug-v">${fmt(total*1.3)}</div></div>
+  `;
+  const ok2=total<=presup;
+  const diff=total-presup;
+  const pct=Math.min(total/presup*100,150).toFixed(0);
+  const bar=document.createElement('div');
+  bar.style.cssText='margin-top:12px;padding:12px;border-radius:8px;border:1px solid '+(ok2?'var(--gr4)':'#f4949440')+';background:'+(ok2?'var(--gr3)':'var(--rd2)');
+  bar.innerHTML=
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
+      '<span style="font-size:12px;font-weight:700;color:'+(ok2?'var(--gr)':'var(--rd)')+'">'+
+        (ok2?'✅ Dentro del presupuesto':'⚠️ Por encima del presupuesto')+
+      '</span>'+
+      '<span style="font-size:15px;font-weight:700;color:'+(ok2?'var(--gr)':'var(--rd)')+'">'+
+        (diff>=0?'+':'')+fmt(diff)+'</span>'+
+    '</div>'+
+    '<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:8px">'+
+      '<span>Presupuestado: <strong>'+fmt(presup)+'</strong></span>'+
+      '<span>Real: <strong>'+fmt(total)+'</strong></span>'+
+    '</div>'+
+    '<div class="presup-bar"><div class="presup-fill" style="width:'+pct+'%;background:'+(ok2?'var(--gr)':'var(--rd)')+'"></div></div>';
+  document.getElementById('detCosto').appendChild(bar);
+}
+
+// ── REPORTES ─────────────────────────────────────────
+async function calcRep(){
+  const todos=await getAll();
+  const desde=document.getElementById('rp-d').value;
+  const hasta=document.getElementById('rp-h').value;
+  const f=todos.filter(r=>{if(desde&&r.fecha<desde)return false;if(hasta&&r.fecha>hasta)return false;return true;});
+  const cont=document.getElementById('repCont');
+  if(!f.length){cont.innerHTML='<div class="empty">\u{1F4CA}<br>Sin datos para el per\u00edodo.</div>';return;}
+  const totPaq=f.reduce((s,r)=>s+(r.totM1+r.totM2+r.totM3),0);
+  const totHar=f.reduce((s,r)=>s+(r.harTotal||0),0);
+  const totGas=f.reduce((s,r)=>s+(r.gasConsumo||0),0);
+  const pM1=f.reduce((s,r)=>s+r.totM1,0);
+  const pM2=f.reduce((s,r)=>s+r.totM2,0);
+  const pM3=f.reduce((s,r)=>s+r.totM3,0);
+  const cM1=f.reduce((s,r)=>s+(r.totC1||0),0);
+  const cM2=f.reduce((s,r)=>s+(r.totC2||0),0);
+  const cM3=f.reduce((s,r)=>s+(r.totC3||0),0);
+  const totCombos=cM1+cM2+cM3;
+  const paqEqTotal=totPaq+totCombos*(20/50);
+  const diasMap={};
+  f.forEach(r=>{
+    const d=r.fecha;
+    if(!diasMap[d])diasMap[d]={paq:0,har:0,gas:0,m1:0,m2:0,m3:0,c1:0,c2:0,c3:0,ops:[]};
+    diasMap[d].paq+=r.totM1+r.totM2+r.totM3;
+    diasMap[d].har+=r.harTotal||0;
+    diasMap[d].gas+=r.gasConsumo||0;
+    if(r.maq1)diasMap[d].m1=1;
+    if(r.maq2)diasMap[d].m2=1;
+    if(r.maq3)diasMap[d].m3=1;
+    diasMap[d].c1+=(r.totC1||0);diasMap[d].c2+=(r.totC2||0);diasMap[d].c3+=(r.totC3||0);
+    [r.op1,r.op2,r.op3,r.op4,r.op5,r.op6,r.op7,r.op8].filter(Boolean).forEach(function(op){if(diasMap[d].ops.indexOf(op)<0)diasMap[d].ops.push(op);});
+  });
+  const costosDia=Object.values(diasMap).map(d=>d.paq?calcCostoVal(d.paq,d.har,d.gas,d.m1,d.m2,d.m3,d.ops,d.c1,d.c2,d.c3):0).filter(v=>v>0);
+  const costProm=costosDia.length?costosDia.reduce((a,b)=>a+b,0)/costosDia.length:0;
+  const maxM=Math.max(pM1,pM2,pM3)||1;
+  const fmt=v=>'$'+Math.round(v).toLocaleString('es-CO');
+  const porOp={};
+  f.forEach(r=>{
+    const paq=r.totM1+r.totM2+r.totM3;
+    [r.op1,r.op2,r.op3,r.op4,r.op5].filter(Boolean).forEach(function(op){if(!porOp[op])porOp[op]=0;porOp[op]+=paq;});
+  });
+  const maxOp=Math.max(...Object.values(porOp))||1;
+  const maxC=Math.max(cM1,cM2,cM3)||1;
+  const maqBars=[['Máquina 1',pM1],['Máquina 2',pM2],['Máquina 3',pM3]].map(function(x){
+    return '<div class="barrow"><div class="blbl">'+x[0]+'</div><div class="btrack"><div class="bfill" style="width:'+Math.round(x[1]/maxM*100)+'%"></div></div><div class="bval">'+x[1].toLocaleString('es-CO')+'</div></div>';
+  }).join('');
+  const opBars=Object.entries(porOp).sort(function(a,b){return b[1]-a[1];}).slice(0,6).map(function(x){
+    return '<div class="barrow"><div class="blbl" title="'+x[0]+'">'+x[0].split(' ')[0]+'</div><div class="btrack"><div class="bfill am" style="width:'+Math.round(x[1]/maxOp*100)+'%"></div></div><div class="bval">'+x[1].toLocaleString('es-CO')+'</div></div>';
+  }).join('');
+  cont.innerHTML=
+    '<div class="stat-g">'+
+    '<div class="sc"><div class="sc-l">Total paquetes</div><div class="sc-v">'+totPaq.toLocaleString('es-CO')+'<span class="sc-u"> paq</span></div></div>'+
+    '<div class="sc"><div class="sc-l">Harina consumida</div><div class="sc-v">'+totHar.toFixed(1)+'<span class="sc-u"> kg</span></div></div>'+
+    '<div class="sc"><div class="sc-l">Gas consumido</div><div class="sc-v">'+totGas.toFixed(1)+'<span class="sc-u"> m³</span></div></div>'+
+    '<div class="sc"><div class="sc-l">Costo prom/paq</div><div class="sc-v">'+fmt(costProm)+'</div></div>'+
+    '<div class="sc"><div class="sc-l">Harina/paquete</div><div class="sc-v">'+(paqEqTotal?((totHar/paqEqTotal)*1000).toFixed(0):0)+'<span class="sc-u"> g</span></div></div>'+
+    '<div class="sc"><div class="sc-l">Turnos</div><div class="sc-v">'+f.length+'</div></div>'+
+    '</div>'+
+    '<div class="chart-c"><div class="ct">Obleas por máquina</div>'+maqBars+'</div>'+
+    '<div class="chart-c"><div class="ct">Combos por máquina</div>'+
+    [['Máquina 1',cM1],['Máquina 2',cM2],['Máquina 3',cM3]].map(function(x){return '<div class="barrow"><div class="blbl">'+x[0]+'</div><div class="btrack"><div class="bfill" style="width:'+Math.round(x[1]/maxC*100)+'%"></div></div><div class="bval">'+x[1].toLocaleString('es-CO')+'</div></div>';}).join('')+'</div>'+
+    '<div class="chart-c"><div class="ct">Producción por operario</div>'+opBars+'</div>';
+  const rb=document.getElementById('repBtns');if(rb)rb.style.display='flex';
+}
+
+async function expCSVReporte(){
+  const desde=document.getElementById('rp-d').value;
+  const hasta=document.getElementById('rp-h').value;
+  document.getElementById('r-d').value=desde;
+  document.getElementById('r-h').value=hasta;
+  await expCSV();
+}
+
+async function expCSV(){
+  const t=await getAll();if(!t.length){alert('No hay registros para exportar.');return;}
+  const desde=document.getElementById('r-d').value;
+  const hasta=document.getElementById('r-h').value;
+  const f=t.filter(r=>{if(desde&&r.fecha<desde)return false;if(hasta&&r.fecha>hasta)return false;return true;}).sort((a,b)=>a.fecha.localeCompare(b.fecha));
+  if(!f.length){alert('No hay registros en el período seleccionado.');return;}
+  const sep=',';
+  const q=v=>'"'+(String(v===null||v===undefined?'':v).replace(/"/g,'""'))+'"';
+  const rows=[];
+  rows.push([q('=== REPORTE DE PRODUCCIÓN OBLEAS - DULCE MARÍA ===')].join(sep));
+  rows.push([q('Período:'),q(desde||'inicio'),q('al'),q(hasta||'hoy'),q(''),q('Generado:'),q(new Date().toLocaleString('es-CO'))].join(sep));
+  rows.push([''].join(sep));
+  rows.push([q('--- DETALLE POR TURNO ---')].join(sep));
+  rows.push([q('Fecha'),q('Lote'),q('Operario(s)'),q('Hora Ing'),q('Hora Sal'),q('Paq M1'),q('Paq M2'),q('Paq M3'),q('TOTAL PAQ'),q('Harina kg'),q('Gas m³'),q('Máquinas')].join(sep));
+  f.forEach(r=>{
+    const ops=[r.op1,r.op2,r.op3,r.op4,r.op5].filter(Boolean).join(' / ');
+    const p=r.totM1+r.totM2+r.totM3;
+    const maq=[r.maq1?'M1':'',r.maq2?'M2':'',r.maq3?'M3':''].filter(Boolean).join('+');
+    rows.push([q(r.fecha),q(r.lote||''),q(ops),q(r.hIng||''),q(r.hSal||''),q(r.totM1),q(r.totM2),q(r.totM3),q(p),q((r.harTotal||0).toFixed(3)),q((r.gasConsumo||0).toFixed(2)),q(maq)].join(sep));
+  });
+  rows.push([''].join(sep));rows.push([''].join(sep));
+  rows.push([q('--- RESUMEN DIARIO CON COSTOS ---')].join(sep));
+  rows.push([q('Fecha'),q('Turnos'),q('Operarios'),q('Total Paq'),q('Harina kg'),q('Gas m³'),q('Máq Activas'),q('Costo Harina/paq'),q('Costo Gas/paq'),q('Insumos/paq'),q('Mano Obra/paq'),q('Otros Fijos/paq'),q('Arriendo/paq'),q('COSTO/PAQ'),q('Precio +30%')].join(sep));
+  const dias={};
+  f.forEach(r=>{const d=r.fecha;if(!dias[d])dias[d]={turnos:[],ops:new Set()};dias[d].turnos.push(r);[r.op1,r.op2,r.op3,r.op4,r.op5].filter(Boolean).forEach(o=>dias[d].ops.add(o));});
+  let totPaqMes=0,totHarMes=0,totGasMes=0,sumCosto=0,diasProd=0;
+  Object.entries(dias).sort().forEach(([fecha,{turnos,ops}])=>{
+    const pM1=turnos.reduce((s,r)=>s+r.totM1,0);
+    const pM2=turnos.reduce((s,r)=>s+r.totM2,0);
+    const pM3=turnos.reduce((s,r)=>s+r.totM3,0);
+    const pTot=pM1+pM2+pM3;if(!pTot)return;
+    const har=turnos.reduce((s,r)=>s+(r.harTotal||0),0);
+    const gas=turnos.reduce((s,r)=>s+(r.gasConsumo||0),0);
+    const m1=turnos.some(r=>r.maq1)?1:0;const m2=turnos.some(r=>r.maq2)?1:0;const m3=turnos.some(r=>r.maq3)?1:0;
+    const maqStr=[m1?'M1':'',m2?'M2':'',m3?'M3':''].filter(Boolean).join('+');
+    const cHar=Math.round((har*(cfg.bulto/50))/pTot);
+    const cGas=Math.round((gas*cfg.mgas)/pTot);
+    const cFij=cfg.lec+cfg.adi+cfg.ades+cfg.ico+cfg.bol;
+    const moT=calcMOporOps([...ops]);
+    const cMO=Math.round(moT/pTot);
+    const cOtros=Math.round((cfg.gas2+cfg.jona+cfg.guan+cfg.cin+cfg.caj+cfg.arr)/20/pTot);
+    const cArr=Math.round(cfg.arrs/20/pTot);
+    const cTotal=cHar+cGas+cFij+cMO+cOtros+cArr;
+    totPaqMes+=pTot;totHarMes+=har;totGasMes+=gas;sumCosto+=cTotal;diasProd++;
+    rows.push([q(fecha),q(turnos.length),q([...ops].join(' / ')),q(pTot),q(har.toFixed(3)),q(gas.toFixed(2)),q(maqStr),q(cHar),q(cGas),q(cFij),q(cMO),q(cOtros),q(cArr),q(cTotal),q(Math.round(cTotal*1.3))].join(sep));
+  });
+  rows.push([''].join(sep));rows.push([''].join(sep));
+  rows.push([q('--- RESUMEN DEL PERÍODO ---')].join(sep));
+  const costProm=diasProd?Math.round(sumCosto/diasProd):0;
+  rows.push([q('Total paquetes:'),q(totPaqMes)].join(sep));
+  rows.push([q('Total harina (kg):'),q(totHarMes.toFixed(3))].join(sep));
+  rows.push([q('Total gas (m³):'),q(totGasMes.toFixed(2))].join(sep));
+  rows.push([q('Días con producción:'),q(diasProd)].join(sep));
+  rows.push([q('Promedio paquetes/día:'),q(diasProd?Math.round(totPaqMes/diasProd):0)].join(sep));
+  rows.push([q('COSTO PROMEDIO/PAQ (período):'),q('$'+costProm.toLocaleString('es-CO'))].join(sep));
+  rows.push([q('Precio mínimo sugerido (+30%):'),q('$'+Math.round(costProm*1.3).toLocaleString('es-CO'))].join(sep));
+  const blob=new Blob(['﻿'+rows.join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='reporte_obleas_'+(desde||'todo')+'_al_'+(hasta||'hoy')+'.csv';a.click();
+}
+async function expJSON(){const t=await getAll();const b=new Blob([JSON.stringify(t,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='respaldo_obleas_'+new Date().toISOString().slice(0,10)+'.json';a.click();}
+function impJSON(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(!Array.isArray(d))throw 0;const existing=getTurnos();const ids=new Set(existing.map(r=>r.id));let c=0;d.forEach(reg=>{if(!ids.has(reg.id)){existing.push(reg);c++;}});saveTurnos(existing);alert('✓ Importados '+c+' registros nuevos.');updDbInf();}catch{alert('Error: archivo inválido.');}};r.readAsText(f);}
+function borrarTodo(){
+  if(!confirm('¿Borrar TODOS los registros?'))return;
+  saveTurnos([]);
+  fotosMap={};
+  // Limpiar estado del DOM para que el próximo registro sea limpio
+  const csOps=document.getElementById('cs-ops');if(csOps)csOps.value='';
+  document.getElementById('cs-paq').value=0;
+  document.getElementById('cs-har').value=0;
+  document.getElementById('cs-gas').value=0;
+  renderInicio();renderRegs();updDbInf();calcCosto();
+  alert('Base de datos vaciada.');
+}
+function updDbInf(){const t=getTurnos();const fs=t.map(r=>r.fecha).sort();document.getElementById('dbInf').innerHTML=`Registros: <strong>${t.length}</strong><br>${t.length?`Período: <strong>${fs[0]}</strong> → <strong>${fs[fs.length-1]}</strong><br>`:''}Almacenado en este dispositivo (localStorage).`;}
+
+function showAlrt(pg,msg,type){const id='alrt-'+pg;const el=document.getElementById(id);if(!el)return;el.textContent=msg;el.className='alrt alrt-'+type;el.style.display='block';clearTimeout(el._t);el._t=setTimeout(()=>el.style.display='none',5000);}
+
+(async()=>{
+  loadCfg();buildMasas();buildChecklist();buildMasasS();renderInicio();updDbInf();
+  const hoy=new Date().toISOString().slice(0,10);
+  document.getElementById('e-fecha').value=hoy;
+  const h30=new Date(Date.now()-30*864e5).toISOString().slice(0,10);
+  ['r-d','rp-d'].forEach(id=>document.getElementById(id).value=h30);
+  ['r-h','rp-h'].forEach(id=>document.getElementById(id).value=hoy);
+  const hoyC=new Date().toISOString().slice(0,10);
+  document.getElementById('cs-fecha').value=hoyC;
+  cargarDiaCosto();updDbInf();checkApiKey();
+})();
+
+// ── TRABAJADORES ─────────────────────────────────────
+const WORKERS = [
+  {nombre:'Yasir',    rol:'Maquinero', maq:1},
+  {nombre:'Jairo',    rol:'Masero',    maq:1},
+  {nombre:'Angie',    rol:'Cortadora', maq:1},
+  {nombre:'Fabian',   rol:'Maquinero', maq:2},
+  {nombre:'Karolay',  rol:'Cortadora', maq:2},
+  {nombre:'Benjamin', rol:'Maquinero', maq:3},
+  {nombre:'Karolina', rol:'Cortadora', maq:3},
+  {nombre:'Carlos',   rol:'Masero',    maq:3},
+];
+const DESCUENTO_BONO=5000;
+
+function getWorkerPago(nombre){
+  const w=WORKERS.find(x=>x.nombre.toLowerCase()===nombre.toLowerCase());
+  if(!w)return 0;
+  if(w.maq===1&&w.rol==='Maquinero')return cfg.maq1m||70500;
+  if(w.maq===1&&w.rol==='Masero')   return cfg.maq1ma||65000;
+  if(w.maq===1&&w.rol==='Cortadora')return cfg.maq1c||65000;
+  if(w.maq===2&&w.rol==='Maquinero')return cfg.maq2m||60000;
+  if(w.maq===2&&w.rol==='Cortadora')return cfg.maq2c||60000;
+  if(w.maq===3&&w.rol==='Maquinero')return cfg.maq3m||70500;
+  if(w.maq===3&&w.rol==='Cortadora')return cfg.maq3c||65000;
+  if(w.maq===3&&w.rol==='Masero')   return cfg.maq3ma||65000;
+  return 0;
+}
+
+function getMaqName(n){return n===1?'Máquina 1':n===2?'Máquina 2':'Máquina 3';}
+
+function initNomina(){
+  const hoy=new Date().toISOString().slice(0,10);
+  const hace14=new Date(Date.now()-14*864e5).toISOString().slice(0,10);
+  if(!document.getElementById('nom-d').value)document.getElementById('nom-d').value=hace14;
+  if(!document.getElementById('nom-h').value)document.getElementById('nom-h').value=hoy;
+  calcBonosTotal();
+}
+
+// Get bono storage
+function getBonosDB(){
+  try{const d=localStorage.getItem('obleas_bonos');return d?JSON.parse(d):{};}catch(e){return {};}
+}
+function saveBonosDB(b){try{localStorage.setItem('obleas_bonos',JSON.stringify(b));}catch(e){}}
+
+async function calcNomina(){
+  const desde=document.getElementById('nom-d').value;
+  const hasta=document.getElementById('nom-h').value;
+  if(!desde||!hasta){showAlrt('nomina','Selecciona el período.','err');return;}
+
+  const todos=await getAll();
+  const turnos=todos.filter(r=>r.fecha>=desde&&r.fecha<=hasta);
+
+  // Contar turnos por trabajador
+  const resumen={};
+  WORKERS.forEach(w=>{resumen[w.nombre]={...w,turnos:0,bruto:0,bono:0,neto:0,fechas:[]};});
+  turnos.forEach(r=>{
+    const ops=[r.op1,r.op2,r.op3,r.op4,r.op5,r.op6,r.op7,r.op8].filter(Boolean);
+    ops.forEach(op=>{
+      const _w=WORKERS.find(w=>w.nombre.toLowerCase()===op.toLowerCase());const key=_w?_w.nombre:null;
+      if(key&&resumen[key]){resumen[key].turnos++;resumen[key].fechas.push(r.fecha);}
+    });
+  });
+
+  // Calcular pagos y acumular bonos
+  const bonos=getBonosDB();
+  Object.values(resumen).forEach(w=>{
+    if(w.turnos>0){
+      const pago=getWorkerPago(w.nombre);
+      w.bruto=w.turnos*pago;
+      w.bono=w.turnos*DESCUENTO_BONO;
+      w.neto=w.bruto-w.bono;
+      if(!bonos[w.nombre])bonos[w.nombre]=0;
+      bonos[w.nombre]+=w.bono;
+    }
+  });
+  saveBonosDB(bonos);
+
+  const fmt=v=>'$'+v.toLocaleString('es-CO');
+  const todos_w=Object.values(resumen);
+  const inactivos=todos_w.filter(w=>w.turnos===0);
+  const totalBruto=todos_w.reduce((s,w)=>s+w.bruto,0);
+  const totalBono=todos_w.reduce((s,w)=>s+w.bono,0);
+  const totalNeto=todos_w.reduce((s,w)=>s+w.neto,0);
+
+  // Función para renderizar tarjeta de un trabajador
+  const cardW=w=>`
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--bd)">
+      <div>
+        <div style="font-weight:700;font-size:13px">${w.nombre}</div>
+        <div style="font-size:11px;color:var(--t2);margin-top:1px">${w.rol}</div>
+        <div style="font-size:10px;color:var(--t3);margin-top:3px">${w.turnos} turno(s) · ${[...new Set(w.fechas)].sort().slice(-3).join(', ')}${w.fechas.length>3?'…':''}</div>
+      </div>
+      <div style="text-align:right;min-width:120px">
+        <div style="font-size:16px;font-weight:700;color:var(--gr)">${fmt(w.neto)}</div>
+        <div style="font-size:10px;color:var(--t2)">Bruto ${fmt(w.bruto)}</div>
+        <div style="font-size:10px;color:var(--am)">Bono ${fmt(w.bono)}</div>
+      </div>
+    </div>`;
+
+  // Función para bloque por máquina
+  const maqColors=[['var(--gr)','var(--gr3)','var(--gr4)'],['#7b5ea7','#f0eaf8','#d8c8f0'],['#1565c0','#e3f0fb','#b3d4f5']];
+  const bloqMaq=(numMaq)=>{
+    const wm=todos_w.filter(w=>w.maq===numMaq);
+    const actM=wm.filter(w=>w.turnos>0);
+    const brutoM=wm.reduce((s,w)=>s+w.bruto,0);
+    const bonoM=wm.reduce((s,w)=>s+w.bono,0);
+    const netoM=wm.reduce((s,w)=>s+w.neto,0);
+    const [col,bg,bd]=maqColors[numMaq-1];
+    return `
+    <div style="border:1px solid ${bd};border-radius:10px;overflow:hidden;margin-bottom:12px">
+      <div style="background:${bg};padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid ${bd}">
+        <div style="font-size:12px;font-weight:700;color:${col};text-transform:uppercase;letter-spacing:.5px">⚙️ ${getMaqName(numMaq)}</div>
+        <div style="font-size:15px;font-weight:700;color:${col}">${fmt(netoM)}</div>
+      </div>
+      <div style="padding:0 14px">
+        ${wm.map(w=>w.turnos>0?cardW(w):`
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bd);opacity:.45">
+          <div>
+            <div style="font-size:13px;font-weight:600">${w.nombre}</div>
+            <div style="font-size:11px;color:var(--t2)">${w.rol}</div>
+          </div>
+          <div style="font-size:12px;color:var(--t3)">Sin turnos</div>
+        </div>`).join('')}
+        <div style="display:flex;justify-content:space-between;padding:10px 0;font-size:12px">
+          <span style="color:var(--t2)">Subtotal bruto: <strong>${fmt(brutoM)}</strong></span>
+          <span style="color:var(--am)">Bonos: <strong>${fmt(bonoM)}</strong></span>
+        </div>
+      </div>
+    </div>`;
+  };
+
+  document.getElementById('nominaResult').innerHTML=`
+    <div class="sec">
+      <div class="stit">💰 Liquidación ${desde} al ${hasta}</div>
+      <p style="font-size:12px;color:var(--t2);margin-bottom:14px">${turnos.length} turno(s) registrado(s) en el período</p>
+      ${bloqMaq(1)}
+      ${bloqMaq(2)}
+      ${bloqMaq(3)}
+      ${inactivos.length?`<p style="font-size:11px;color:var(--t3);margin-bottom:12px">Sin turnos: ${inactivos.map(w=>w.nombre).join(', ')}</p>`:''}
+      <div style="background:var(--gr3);border-radius:10px;padding:14px;border:1px solid var(--gr4)">
+        <div style="font-size:11px;font-weight:700;color:var(--gr);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">🏦 Resumen total del período</div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:13px;color:var(--t2)">Total bruto</span>
+          <span style="font-weight:600">${fmt(totalBruto)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+          <span style="font-size:13px;color:var(--am)">Total bonos descontados</span>
+          <span style="font-weight:600;color:var(--am)">${fmt(totalBono)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;border-top:2px solid var(--gr);padding-top:10px">
+          <span style="font-size:14px;font-weight:700;color:var(--gr)">TOTAL A PAGAR</span>
+          <span style="font-size:22px;font-weight:700;color:var(--gr)">${fmt(totalNeto)}</span>
+        </div>
+      </div>
+    </div>`;
+  calcBonosTotal();
+}
+
+function calcBonosTotal(){
+  const bonos=getBonosDB();
+  const fmt=v=>'$'+v.toLocaleString('es-CO');
+  const total=Object.values(bonos).reduce((s,v)=>s+v,0);
+  const items=WORKERS.map(w=>({nombre:w.nombre,bono:bonos[w.nombre]||0})).filter(w=>w.bono>0);
+
+  document.getElementById('bonosResult').innerHTML=items.length?`
+    ${items.map(w=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd)">
+      <span style="font-size:13px;font-weight:500">${w.nombre}</span>
+      <span style="font-size:14px;font-weight:700;color:var(--am)">${fmt(w.bono)}</span>
+    </div>`).join('')}
+    <div style="display:flex;justify-content:space-between;padding:10px 0 4px;border-top:2px solid var(--am);margin-top:4px">
+      <span style="font-size:13px;font-weight:700;color:var(--am)">Total bonos acumulados</span>
+      <span style="font-size:18px;font-weight:700;color:var(--am)">${fmt(total)}</span>
+    </div>`:
+    '<p style="font-size:13px;color:var(--t2)">No hay bonos acumulados aún.</p>';
+}
+
+async function expNomina(){
+  const desde=document.getElementById('nom-d').value;
+  const hasta=document.getElementById('nom-h').value;
+  if(!desde||!hasta){alert('Selecciona el período primero.');return;}
+  const todos=await getAll();
+  const turnos=todos.filter(r=>r.fecha>=desde&&r.fecha<=hasta);
+  const bonos=getBonosDB();
+  const sep=',';
+  const q=v=>'"'+String(v||'').replace(/"/g,'""')+'"';
+  const rows=[];
+  rows.push([q('NÓMINA DULCE MARÍA - OBLEAS')].join(sep));
+  rows.push([q('Período:'),q(desde),q('al'),q(hasta)].join(sep));
+  rows.push([q('')].join(sep));
+  rows.push([q('Empleado'),q('Rol'),q('Máquina'),q('Turnos'),q('Valor/turno'),q('Bruto'),q('Bono guardado'),q('NETO A PAGAR'),q('Bono acumulado total')].join(sep));
+  const resumen={};
+  WORKERS.forEach(w=>{resumen[w.nombre]={...w,turnos:0};});
+  turnos.forEach(r=>{
+    [r.op1,r.op2,r.op3,r.op4,r.op5].filter(Boolean).forEach(op=>{
+      const _w=WORKERS.find(w=>w.nombre.toLowerCase()===op.toLowerCase());const key=_w?_w.nombre:null;
+      if(key&&resumen[key])resumen[key].turnos++;
+    });
+  });
+  Object.values(resumen).filter(w=>w.turnos>0).forEach(w=>{
+    const pago=getWorkerPago(w.nombre);
+    const bruto=w.turnos*pago;
+    const bono=w.turnos*DESCUENTO_BONO;
+    const neto=bruto-bono;
+    const bonoAcum=bonos[w.nombre]||0;
+    rows.push([q(w.nombre),q(w.rol),q(getMaqName(w.maq)),q(w.turnos),q(pago),q(bruto),q(bono),q(neto),q(bonoAcum)].join(sep));
+  });
+  const blob=new Blob(['﻿'+rows.join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='nomina_obleas_'+desde+'_'+hasta+'.csv';a.click();
+}
+
+</script>
+</body>
+</html>
