@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnóstico</title>
+<style>
+body{font-family:Arial;padding:20px;background:#f5f5f5}
+.ok{color:green;font-weight:bold}
+.err{color:red;font-weight:bold}
+.sec{background:white;padding:15px;margin:10px 0;border-radius:8px;border:1px solid #ddd}
+</style>
+</head>
+<body>
+<h2>🔍 Diagnóstico App Obleas DM</h2>
+<div id="resultado"></div>
+<script>
+var log = [];
+function check(nombre, fn) {
+    try {
+        fn();
+        log.push('<div class="ok">✅ ' + nombre + '</div>');
+    } catch(e) {
+        log.push('<div class="err">❌ ' + nombre + ': ' + e.message + '</div>');
+    }
+}
+
+// Test localStorage
+check('localStorage disponible', function() {
+    localStorage.setItem('test', '1');
+    localStorage.removeItem('test');
+});
+
+// Test const/let
+check('const/let ES6', function() {
+    const x = 1; let y = 2;
+    if(x+y !== 3) throw new Error('fallo');
+});
+
+// Test arrow functions
+check('Arrow functions =>', function() {
+    var fn = (x) => x * 2;
+    if(fn(3) !== 6) throw new Error('fallo');
+});
+
+// Test template literals
+check('Template literals `${}`', function() {
+    var x = 'mundo';
+    var r = `hola ${x}`;
+    if(r !== 'hola mundo') throw new Error('fallo');
+});
+
+// Test template anidados
+check('Template anidados `${cond?`A`:"B"}`', function() {
+    var x = true;
+    var r = `${x ? `SI` : "NO"}`;
+    if(r !== 'SI') throw new Error('fallo');
+});
+
+// Test spread object
+check('Spread objeto {...obj}', function() {
+    var a = {x:1};
+    var b = {...a, y:2};
+    if(b.x !== 1 || b.y !== 2) throw new Error('fallo');
+});
+
+// Test spread array
+check('Spread array [...arr]', function() {
+    var a = [1,2,3];
+    var b = [...a];
+    if(b.length !== 3) throw new Error('fallo');
+});
+
+// Test new Set
+check('new Set()', function() {
+    var s = new Set([1,2,2,3]);
+    if(s.size !== 3) throw new Error('fallo');
+});
+
+// Test async/await
+check('async/await', function() {
+    async function test() { return 1; }
+    if(typeof test !== 'function') throw new Error('fallo');
+});
+
+// Test flatMap
+check('Array.flatMap()', function() {
+    var r = [[1],[2,3]].flatMap(function(x){return x;});
+    if(r.length !== 3) throw new Error('fallo');
+});
+
+// Test Promise
+check('Promise', function() {
+    var p = new Promise(function(res){res(1);});
+    if(typeof p !== 'object') throw new Error('fallo');
+});
+
+document.getElementById('resultado').innerHTML = 
+    '<div class="sec"><h3>Resultados:</h3>' + log.join('') + '</div>';
+</script>
+</body>
+</html>
