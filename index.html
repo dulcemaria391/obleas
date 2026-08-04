@@ -583,6 +583,7 @@ table.rt tr:nth-child(even) td{background:var(--bg2)}
     <div id="inv-tabla"></div>
     <button class="btn bs btn-full" style="margin-top:10px" onclick="expInvCSV()">⬇️ Descargar inventario CSV</button>
     <button class="btn bs btn-full" style="margin-top:8px" onclick="recalcularInventarioDesdeHistorial()">🔄 Recalcular consumo desde turnos guardados</button>
+    <button class="btn bs btn-full" style="margin-top:8px;color:var(--rd);border-color:var(--rd)" onclick="corregirUnidadesHarina()">🔧 Corregir unidades harina (gramos → kg)</button>
   </div>
 </div>
 
@@ -2843,6 +2844,51 @@ function editarMovInv(ts,key){
 
   showAlrt('inv','✅ Movimiento actualizado. Stock recalculado.','ok');
   verKardex(key);
+}
+
+function corregirUnidadesHarina(){
+  if(!confirm('\u00bfCorregir las unidades de harina en el inventario?\n\nEsto detectar\u00e1 entradas de harina registradas en gramos y las convertir\u00e1 a kg dividi\u00e9ndolas entre 1000.\n\nSolo afecta entradas mayores a 1000 unidades (que claramente son gramos, no kg).')) return;
+  try{
+    var movs = getInvMovimientos();
+    var corregidos = 0;
+    movs.forEach(function(m){
+      if(m.insumo==='harina' && m.tipo==='entrada' && (m.cantidad||0) > 500){
+        // Claramente en gramos — convertir a kg
+        m.cantidad = m.cantidad / 1000;
+        m.costoUnitario = (m.costoUnitario||0) * 1000; // costo por kg
+        m.costoTotal = m.cantidad * m.costoUnitario;
+        m.stockResultante = (m.stockResultante||0) / 1000;
+        corregidos++;
+      }
+    });
+    saveInvMovimientos(movs);
+
+    // Recalcular stock y costo promedio de harina desde movimientos corregidos
+    var movsHarina = movs.filter(function(m){return m.insumo==='harina';});
+    movsHarina.sort(function(a,b){return a.ts.localeCompare(b.ts);});
+    var stock = 0;
+    var costoPromedio = 0;
+    movsHarina.forEach(function(m){
+      if(m.tipo==='entrada'){
+        var nuevoProm = (stock*costoPromedio + (m.cantidad||0)*(m.costoUnitario||0)) / ((stock+(m.cantidad||0))||1);
+        stock += (m.cantidad||0);
+        costoPromedio = nuevoProm;
+      } else {
+        stock -= (m.cantidad||0);
+      }
+    });
+
+    var inv = getInventario();
+    if(!inv.harina) inv.harina = {stock:0, costoPromedio:2900, stockMin:50};
+    inv.harina.stock = stock;
+    inv.harina.costoPromedio = costoPromedio > 0 ? costoPromedio : 2900;
+    saveInventario(inv);
+
+    showAlrt('inv','\u2705 Corregidas '+corregidos+' entrada(s) de harina de gramos a kg. Stock recalculado: '+stock.toFixed(3)+' kg.','ok');
+    renderInvStock();
+  }catch(e){
+    alert('Error: '+e.message);
+  }
 }
 
 </script>
