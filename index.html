@@ -2847,38 +2847,45 @@ function editarMovInv(ts,key){
 }
 
 function corregirUnidadesHarina(){
-  if(!confirm('¿Corregir las entradas de harina que quedaron en fracciones de kg (ej: 0.841 en lugar de 841.28)?\n\nEsto multiplicará ×1000 las entradas menores a 2 kg que claramente son errores de unidad.\n\nLos consumos de producción NO se tocan.')) return;
+  if(!confirm('¿Corregir errores de unidad en harina?\n\nEsto detectará y corregirá:\n- Entradas < 2 kg (están en fracciones) → ×1000\n- Salidas > 1000 kg (están en gramos) → ÷1000\n\nLos valores normales no se tocan.')) return;
   try{
     var movs = getInvMovimientos();
     var corregidos = 0;
     var detalles = [];
     movs.forEach(function(m){
-      if(m.insumo==='harina' && m.tipo==='entrada'){
+      if(m.insumo==='harina'){
         var cant = m.cantidad||0;
-        if(cant > 0 && cant < 2){
-          // Está en fracciones de kg (debería ser kg enteros) → ×1000
-          detalles.push(cant.toFixed(3)+' → '+(cant*1000).toFixed(3)+' kg');
+        if(m.tipo==='entrada' && cant > 0 && cant < 2){
+          // Entrada en fracciones → ×1000
+          detalles.push('Entrada '+cant.toFixed(3)+' → '+(cant*1000).toFixed(3)+' kg');
           m.cantidad = cant * 1000;
           m.costoUnitario = (m.costoUnitario||0) / 1000;
           m.costoTotal = m.cantidad * m.costoUnitario;
           m.stockResultante = (m.stockResultante||0) * 1000;
           corregidos++;
+        } else if(m.tipo==='salida' && cant > 1000){
+          // Salida en gramos → ÷1000
+          detalles.push('Salida '+cant.toFixed(3)+' → '+(cant/1000).toFixed(3)+' kg');
+          m.cantidad = cant / 1000;
+          m.costoTotal = m.cantidad * (m.costoUnitario||0);
+          m.stockResultante = (m.stockResultante||0) + cant - (cant/1000);
+          corregidos++;
         }
       }
     });
     if(!corregidos){
-      showAlrt('inv','No se encontraron entradas con error de unidad en harina.','info');
+      showAlrt('inv','No se encontraron errores de unidad en harina.','ok');
       return;
     }
     saveInvMovimientos(movs);
-    // Recalcular stock y costo promedio de harina
+    // Recalcular stock y costo promedio desde cero
     var movsHarina = movs.filter(function(m){return m.insumo==='harina';});
     movsHarina.sort(function(a,b){return a.ts.localeCompare(b.ts);});
     var stock = 0;
     var costoPromedio = 0;
     movsHarina.forEach(function(m){
       if(m.tipo==='entrada'){
-        var nuevoProm = (stock*costoPromedio + (m.cantidad||0)*(m.costoUnitario||0)) / ((stock+(m.cantidad||0))||1);
+        var nuevoProm=(stock*costoPromedio+(m.cantidad||0)*(m.costoUnitario||0))/((stock+(m.cantidad||0))||1);
         stock += (m.cantidad||0);
         costoPromedio = nuevoProm;
       } else {
@@ -2886,11 +2893,11 @@ function corregirUnidadesHarina(){
       }
     });
     var inv = getInventario();
-    if(!inv.harina) inv.harina = {stock:0, costoPromedio:2900, stockMin:50};
+    if(!inv.harina) inv.harina = {stock:0,costoPromedio:2900,stockMin:50};
     inv.harina.stock = stock;
     inv.harina.costoPromedio = costoPromedio > 0 ? costoPromedio : 2900;
     saveInventario(inv);
-    showAlrt('inv','✅ Corregidas '+corregidos+' entrada(s): '+detalles.join(', ')+'. Stock actual: '+stock.toFixed(3)+' kg.','ok');
+    showAlrt('inv','✅ '+corregidos+' corrección(es): '+detalles.join(' | ')+'. Stock: '+stock.toFixed(3)+' kg.','ok');
     renderInvStock();
     verKardex('harina');
   }catch(e){
