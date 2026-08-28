@@ -839,56 +839,58 @@ async function llamarIA(imageBase64,apiKey){
   document.getElementById('progressTxt').textContent='Finalizando...';
 
   const base64=imageBase64.split(',')[1];
-  const prompt=`Eres un asistente que extrae datos de planillas de producción de obleas (FR-PRO-OB-01).
-Analiza la imagen y extrae TODOS los datos visibles. Responde SOLO con un JSON válido, sin texto adicional, con esta estructura exacta:
+  const prompt=`Eres un asistente experto en leer planillas físicas de producción de obleas (FR-PRO-OB-01 Dulce María).
+Analiza la imagen y extrae TODOS los datos visibles. Responde SOLO con un JSON válido, sin texto adicional.
 
+ESTRUCTURA EXACTA DEL FORMULARIO:
+
+1. ENCABEZADO: fecha/día en la esquina superior derecha.
+
+2. DATOS GENERALES — tabla de operarios con nombres IMPRESOS y una casilla al lado para marcar:
+   - MÁQUINA 1: Yasir (Maquinero), Angie (Cortadora), Jairo (Masero)
+   - MÁQUINA 2: Fabian (Maquinero), Karolay (Cortadora)
+   - MÁQUINA 3: Benjamin (Maquinero), Karolina (Cortadora), Carlos (Masero)
+   Para cada operario: si la casilla tiene marca (✓, X, tilde, gancho o cualquier símbolo) → devuelve el nombre. Si está vacía → devuelve "".
+
+3. CONTROL DE GAS: tres campos: "Gas inicial", "Gas final", "Consumo (auto)".
+
+4. CONTROL DE HARINA: DOS filas (Turno 1 y Turno 2), cada una con:
+   "Harina inicial (kg)", "Harina Adicional (kg)", "Harina Final (kg)".
+
+5. PRODUCCIÓN POR MASA: tabla con 22 filas numeradas. Columnas:
+   "Masa N°", "Harina usada (kg)", "Obleas maquina 1 (grande)", "Obleas maquina 2 (pequeña)", "Obleas maquina 3 (grande)", "COMBOS MAQ 1", "COMBOS MAQ 2", "COMBOS MAQ 3", "OBSERVACIONES".
+
+JSON A DEVOLVER:
 {
-  "fecha": "YYYY-MM-DD o vacío. El año actual es 2026.",
-  "lote": "número de lote o vacío",
-  "hora_ingreso": "HH:MM o vacío",
-  "hora_salida": "HH:MM o vacío",
-  "maquinero_m1": "nombre escrito en celda MAQUINERO MAQ 1 o vacío",
-  "cortador_m1": "nombre escrito en celda CORTADOR MAQ 1 o vacío",
-  "masero_m1": "nombre escrito en celda MASERO MAQ 1 o vacío",
-  "maquinero_m2": "nombre escrito en celda MAQUINERO MAQ 2 o vacío",
-  "cortador_m2": "nombre escrito en celda CORTADOR MAQ 2 o vacío",
-  "maquinero_m3": "nombre escrito en celda MAQUINERO MAQ 3 o vacío",
-  "cortador_m3": "nombre escrito en celda CORTADOR MAQ 3 o vacío",
-  "masero_m3": "nombre escrito en celda MASERO MAQ 3 o vacío",
-  "supervisor": "vacío",
+  "fecha": "YYYY-MM-DD — año siempre 2026 si ves 26 o 25",
+  "operario1": "Yasir si su casilla está marcada, si no vacío",
+  "operario2": "Angie si su casilla está marcada, si no vacío",
+  "operario3": "Jairo si su casilla está marcada, si no vacío",
+  "operario4": "Fabian si su casilla está marcada, si no vacío",
+  "operario5": "Karolay si su casilla está marcada, si no vacío",
+  "operario6": "Benjamin si su casilla está marcada, si no vacío",
+  "operario7": "Karolina si su casilla está marcada, si no vacío",
+  "operario8": "Carlos si su casilla está marcada, si no vacío",
   "gas_inicial": número o 0,
   "gas_final": número o 0,
-  "harina_ini_t1": "Harina inicial TURNO 1 en kg. Si ves 37775 escribe 37.775. Si vacío: 0",
-  "harina_adi_t1": "Harina Adicional TURNO 1 en kg. Misma regla. Si vacío: 0",
-  "harina_fin_t1": "Harina Final TURNO 1 en kg. Misma regla. Si vacío: 0",
-  "harina_ini_t2": "Harina inicial TURNO 2 en kg. Misma regla. Si vacío: 0",
-  "harina_adi_t2": "Harina Adicional TURNO 2 en kg. Misma regla. Si vacío: 0",
-  "harina_fin_t2": "Harina Final TURNO 2 en kg. Misma regla. Si vacío: 0",
+  "harina_ini_t1": número en kg (regla: si ves número >500 divídelo entre 1000) o 0,
+  "harina_adc_t1": número en kg (misma regla) o 0,
+  "harina_fin_t1": número en kg (misma regla) o 0,
+  "harina_ini_t2": número en kg (misma regla) o 0,
+  "harina_adc_t2": número en kg (misma regla) o 0,
+  "harina_fin_t2": número en kg (misma regla) o 0,
   "masas": [
     {"n":1,"harina":0,"obleas_m1":0,"obleas_m2":0,"obleas_m3":0,"combos_m1":0,"combos_m2":0,"combos_m3":0,"obs":""},
-    ... una entrada por cada fila con datos. Columnas en orden exacto: Harina usada (kg), Obleas maquina 1 (grande), Obleas maquina 2 (pequeña), Obleas maquina 3 (grande), COMBOS MAQUINA 1, COMBOS MAQUINA 2, COMBOS MAQUINA 3, OBSERVACIONES. IMPORTANTE: Lee el valor numérico exacto de cada celda de combos. Si tiene número úsalo, si está vacía usa 0. NO omitas estas columnas.
-  ],
-  "observaciones": "texto de observaciones generales o vacío"
+    ... una entrada por cada masa con datos visibles hasta la 22
+  ]
 }
 
-REGLAS CRÍTICAS — OPERARIOS:
-1. Los operarios están escritos en la sección superior de la planilla, ANTES de la tabla de masas.
-2. Hay exactamente 8 celdas de operarios organizadas por máquina:
-   - MÁQUINA 1: maquinero_m1=Yasir, cortador_m1=Angie, masero_m1=Jairo
-   - MÁQUINA 2: maquinero_m2=Fabian, cortador_m2=Karolay
-   - MÁQUINA 3: maquinero_m3=Benjamin, cortador_m3=Karolina, masero_m3=Carlos
-3. Para CADA celda: si el nombre está escrito, cópialo exactamente. Si está en blanco, devuelve "".
-4. Lee las 8 celdas de operarios de forma completamente INDEPENDIENTE entre sí.
-5. NO borres ni dejes en blanco un nombre que sí está escrito en la planilla.
-6. NO agregues nombres que no estén escritos en la planilla.
-
-REGLAS CRÍTICAS — HARINA:
-1. El formato tiene DOS turnos. Turno 1: harina_ini_t1, harina_adi_t1, harina_fin_t1. Turno 2: harina_ini_t2, harina_adi_t2, harina_fin_t2.
-2. Si solo hubo un turno, los campos de Turno 2 quedan en 0.
-3. Regla decimal: si ves 37775 escribe 37.775 (divide entre 1000). Si ves 37.775 úsalo tal cual.
-4. NUNCA devuelvas un valor mayor a 500 — si es mayor a 500 divídelo entre 1000.
-
-Si un valor no es legible o está vacío usa 0 para números y "" para texto. Año siempre 2026 si ves "26" o "25".`;
+REGLAS CRÍTICAS:
+1. Operarios: lee SOLO la casilla de marca — NO el texto manuscrito. El nombre viene del nombre impreso.
+2. Harina: si ves un número mayor a 500, divídelo entre 1000 (está en gramos, conviértelo a kg).
+3. Si un campo está vacío usa 0 para números y "" para texto.
+4. Año siempre 2026. Si ves "26-07-15" interpreta como "2026-07-15".
+5. Las obleas y combos son números enteros (paquetes/unidades).`;
 
   // Try direct first, then fallback proxy
   const body=JSON.stringify({
